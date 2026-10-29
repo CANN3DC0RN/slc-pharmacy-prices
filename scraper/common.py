@@ -27,24 +27,47 @@ def fetch(url):
 
 CATEGORIES = ["Flower", "Vapes", "Concentrates", "Edibles", "Tinctures", "Topicals", "Accessories"]
 
+# Checked in order, so the product form ("gummy", "tincture", "cart") wins over
+# the extraction words ("rosin", "resin", "diamond") that show up in every category.
 _CATEGORY_WORDS = [
-    ("Flower", ["flower", "pre-roll", "preroll", "bud"]),
-    ("Vapes", ["vape", "cart", "pen", "aio", "disposable", "vaporizer"]),
-    ("Concentrates", ["concentrate", "badder", "rosin", "resin", "shatter", "wax", "diamond", "sauce"]),
-    ("Edibles", ["edible", "gummy", "gummies", "chocolate", "beverage", "drink", "tablet", "capsule"]),
-    ("Tinctures", ["tincture", "oral", "syringe", "rso"]),
-    ("Topicals", ["topical", "lotion", "balm", "cream", "transdermal", "non-edible"]),
+    ("Accessories", ["unmedicated", "accessor", "grinder", "battery", "batteries", "glassware"]),
+    ("Topicals", ["topical", "lotion", "balm", "cream", "transdermal", "non-edible", "patch", "roll-on"]),
+    ("Vapes", ["vape", "vaporizer", "cartridge", "cartpen", "cart ", "aio", "all-in-one", "disposable", "pod"]),
+    ("Edibles", ["edible", "gummy", "gummies", "chew", "chocolate", "beverage", "drink", "tablet", "capsule", "lozenge", "mint "]),
+    ("Tinctures", ["tincture", "oral", "syringe", "rso", "spray"]),
+    ("Concentrates", ["concentrate", "badder", "budder", "rosin", "resin", "shatter", "wax", "diamond", "sauce", "sugar", "crumble", "hash", "distillate"]),
+    ("Flower", ["flower", "pre-roll", "preroll", "shake", "smalls", "popcorn"]),
 ]
 
 
-def normalize_category(*hints):
-    text = " ".join(h for h in hints if h).lower()
-    if "unmedicated" in text or "accessor" in text:
-        return "Accessories"
+def _match(text):
+    text = f" {text.lower()} "
     for cat, words in _CATEGORY_WORDS:
         if any(w in text for w in words):
             return cat
-    return "Accessories"
+    return None
+
+
+# Stores file infused products loosely (Dragonfly puts tinctures under "Infused
+# Edible"), so for those catch-all categories an explicit form in the name wins.
+# Never applied to Flower/Vapes, where strain names like "Gummy Bears" would mislead.
+_NAME_OVERRIDES = [
+    ("Topicals", ["transdermal", "patch", "balm", "salve", "lotion"]),
+    ("Tinctures", ["tincture"]),
+    ("Vapes", ["vape", "cartridge", "all-in-one", "aio", "disposable"]),
+]
+
+
+def normalize_category(store_category, *other_hints):
+    """Map a store's category (and, failing that, product name etc.) to ours."""
+    cat = _match(store_category or "")
+    names = " ".join(h for h in other_hints if h)
+    if cat in ("Edibles", "Concentrates"):
+        text = f" {names.lower()} "
+        for override, words in _NAME_OVERRIDES:
+            if any(w in text for w in words):
+                return override
+    return cat or _match(names) or "Accessories"
 
 
 def parse_grams(*texts):
