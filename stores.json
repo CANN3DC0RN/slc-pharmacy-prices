@@ -1,0 +1,42 @@
+[
+  {
+    "id": "dragonfly-slc",
+    "name": "Dragonfly Wellness",
+    "city": "Salt Lake City",
+    "address": "711 S State St, Salt Lake City, UT 84111",
+    "website": "https://dragonflywellness.com/products",
+    "source": "dragonfly"
+  },
+  {
+    "id": "wholesomeco",
+    "name": "WholesomeCo",
+    "city": "West Bountiful",
+    "address": "580 W 100 N Suite 1, West Bountiful, UT 84010",
+    "website": "https://www.wholesome.co/shop",
+    "source": "wholesome"
+  },
+  {
+    "id": "beehive-slc",
+    "name": "Beehive Farmacy",
+    "city": "Salt Lake City",
+    "address": "1991 S 3600 W, Salt Lake City, UT 84104",
+    "website": "https://beehivefarmacy.com/",
+    "source": "partner"
+  },
+  {
+    "id": "the-forest-murray",
+    "name": "The Forest",
+    "city": "Murray",
+    "address": "6041 State St, Murray, UT 84107",
+    "website": "https://theforestutah.com/",
+    "source": "partner"
+  },
+  {
+    "id": "bloc-south-jordan",
+    "name": "Bloc Pharmacy",
+    "city": "South Jordan",
+    "address": "10392 South Jordan Gateway, South Jordan, UT 84095",
+    "website": "https://blocpharmacy.com/southjordan/",
+    "source": "partner"
+  }
+]

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLC Pharmacy Prices</title>
+<meta name="description" content="Compare medical cannabis prices and deals across Salt Lake area pharmacies, updated automatically.">
+<style>
+:root {
+  --bg: #f6f7f4; --card: #ffffff; --text: #1d241f; --muted: #66706a; --line: #e2e6e1;
+  --accent: #2f7d4f; --accent-soft: #e3f1e8; --sale: #c2410c; --sale-soft: #fdecdf;
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121614; --card: #1b201d; --text: #e8ece9; --muted: #9aa49e; --line: #2c332e;
+    --accent: #5cc184; --accent-soft: #1f3327; --sale: #fb923c; --sale-soft: #3a2518;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+header { padding: 28px 0 12px; }
+h1 { margin: 0; font-size: 26px; letter-spacing: -0.02em; }
+.sub { color: var(--muted); margin: 4px 0 0; }
+h2 { font-size: 17px; margin: 28px 0 10px; }
+
+.stores { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.store { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
+.store b { display: block; }
+.store small { color: var(--muted); display: block; }
+.pill { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 99px; margin-top: 6px;
+  background: var(--accent-soft); color: var(--accent); }
+.pill.wait { background: var(--line); color: var(--muted); }
+.pill.stale { background: var(--sale-soft); color: var(--sale); }
+.promo { margin-top: 8px; font-size: 13px; background: var(--sale-soft); color: var(--sale); border-radius: 8px; padding: 6px 8px; }
+
+.best { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+
+.controls { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 12px 0; border-bottom: 1px solid var(--line); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row + .row { margin-top: 8px; }
+input[type=search], select { font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; }
+input[type=search] { flex: 1 1 220px; min-width: 0; }
+.chip { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--card); color: var(--text);
+  border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+.chip[aria-pressed=true] { background: var(--accent); border-color: var(--accent); color: #fff; }
+label.check { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+
+.count { color: var(--muted); font-size: 13px; margin: 12px 0 8px; }
+.list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.item { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px;
+  display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: inherit; }
+.item:hover { border-color: var(--accent); }
+.item .brand { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.item .name { font-weight: 600; }
+.item .meta { font-size: 13px; color: var(--muted); }
+.price { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 6px; flex-wrap: wrap; }
+.price strong { font-size: 20px; font-variant-numeric: tabular-nums; }
+.price s { color: var(--muted); font-size: 13px; }
+.price .ppg { font-size: 12px; color: var(--muted); margin-left: auto; }
+.badge { font-size: 12px; font-weight: 600; color: var(--sale); background: var(--sale-soft); border-radius: 6px; padding: 1px 6px; }
+.where { font-size: 13px; color: var(--accent); font-weight: 600; }
+.more { display: block; margin: 16px auto; }
+footer { color: var(--muted); font-size: 13px; padding: 32px 0 48px; border-top: 1px solid var(--line); margin-top: 32px; }
+.empty { padding: 32px; text-align: center; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>SLC Pharmacy Prices</h1>
+    <p class="sub">Medical cannabis prices and deals from Salt Lake area pharmacies, in one place. <span id="updated"></span></p>
+  </header>
+
+  <h2>Pharmacies</h2>
+  <div class="stores" id="stores"></div>
+
+  <h2>Biggest discounts right now</h2>
+  <div class="best" id="best"></div>
+
+  <h2 id="browse">Compare prices</h2>
+  <div class="controls">
+    <div class="row">
+      <input type="search" id="q" placeholder="Search strain, brand or product…" aria-label="Search products">
+      <select id="sort" aria-label="Sort by">
+        <option value="price">Lowest price</option>
+        <option value="ppg">Lowest price per gram</option>
+        <option value="discount">Biggest discount</option>
+        <option value="thc">Highest THC</option>
+      </select>
+      <select id="store" aria-label="Pharmacy"><option value="">All pharmacies</option></select>
+    </div>
+    <div class="row" id="cats"></div>
+    <div class="row">
+      <span id="sizes" class="row"></span>
+      <label class="check"><input type="checkbox" id="sale"> On sale only</label>
+    </div>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="list" id="list"></div>
+  <button class="chip more" id="more" hidden>Show more</button>
+
+  <footer>
+    Prices come from each pharmacy's online menu and are checked automatically several times a day.
+    Always confirm price and availability with the pharmacy before you go. For Utah medical cannabis
+    cardholders. Not affiliated with any pharmacy listed.
+    <br><br>Run a pharmacy and want your prices listed? Get in touch.
+  </footer>
+</div>
+
+<script>
+const PAGE = 60;
+const SIZES = { Flower: [1, 3.5, 7, 14, 28] };
+const state = { q: "", cat: "Flower", store: "", sale: false, sort: "price", size: null, shown: PAGE };
+let data, storesById = {};
+
+const $ = (id) => document.getElementById(id);
+const money = (n) => "$" + n.toFixed(2).replace(/\.00$/, "");
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pctOff = (p) => (p.regular_price > p.price ? Math.round(100 * (1 - p.price / p.regular_price)) : 0);
+
+function ago(iso) {
+  if (!iso) return "never";
+  const m = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (m < 60) return m + " min ago";
+  if (m < 48 * 60) return Math.round(m / 60) + " hr ago";
+  return Math.round(m / 1440) + " days ago";
+}
+
+function card(p) {
+  const s = storesById[p.store] || {};
+  const off = pctOff(p);
+  const meta = [p.size, p.strain_type, p.thc != null ? p.thc + "% THC" : ""].filter(Boolean).join(" · ");
+  return `<a class="item" href="${esc(p.url || s.website)}" target="_blank" rel="noopener">
+    <span class="brand">${esc(p.brand || p.category)}</span>
+    <span class="name">${esc(p.name)}</span>
+    ${meta ? `<span class="meta">${esc(meta)}</span>` : ""}
+    <span class="where">${esc(s.name)} · ${esc(s.city)}</span>
+    <span class="price"><strong>${money(p.price)}</strong>
+      ${off ? `<s>${money(p.regular_price)}</s><span class="badge">${off}% off</span>` : ""}
+      ${p.price_per_gram ? `<span class="ppg">${money(p.price_per_gram)}/g</span>` : ""}</span>
+  </a>`;
+}
+
+function renderStores() {
+  $("stores").innerHTML = data.stores.map((s) => {
+    const promos = data.deals.filter((d) => d.store === s.id);
+    let pill;
+    if (s.count && s.ok) pill = `<span class="pill">${s.count} prices · ${ago(s.updated)}</span>`;
+    else if (s.count) pill = `<span class="pill stale">${s.count} prices · last good ${ago(s.updated)}</span>`;
+    else pill = `<span class="pill wait">Prices coming soon</span>`;
+    return `<div class="store"><b>${esc(s.name)}</b><small>${esc(s.address)}</small>
+      <small><a href="${esc(s.website)}" target="_blank" rel="noopener">Pharmacy website</a></small>${pill}
+      ${promos.map((d) => `<div class="promo"><b>${esc(d.title)}</b>${d.details ? "<br>" + esc(d.details) : ""}</div>`).join("")}</div>`;
+  }).join("");
+}
+
+function renderBest() {
+  // Top discount per category, so the strip isn't all one product type.
+  const best = {};
+  for (const p of data.products) {
+    if (p.category === "Accessories") continue;
+    const off = pctOff(p);
+    if (off && (!best[p.category] || off > pctOff(best[p.category]))) best[p.category] = p;
+  }
+  const picks = Object.values(best).sort((a, b) => pctOff(b) - pctOff(a)).slice(0, 6);
+  $("best").innerHTML = picks.length ? picks.map(card).join("") : `<div class="empty">No sales found right now.</div>`;
+}
+
+function renderControls() {
+  const cats = ["All", ...new Set(data.products.map((p) => p.category))];
+  const order = ["All", "Flower", "Vapes", "Concentrates", "Edibles", "Tinctures", "Topicals", "Accessories"];
+  cats.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  $("cats").innerHTML = cats.map((c) =>
+    `<button class="chip" data-cat="${esc(c)}" aria-pressed="${(state.cat || "All") === c}">${esc(c)}</button>`).join("");
+  const sizes = SIZES[state.cat] || [];
+  $("sizes").innerHTML = sizes.length ? ["Any size", ...sizes].map((g) => {
+    const v = g === "Any size" ? "" : g;
+    return `<button class="chip" data-size="${v}" aria-pressed="${String(state.size ?? "") === String(v)}">${g === "Any size" ? g : g + "g"}</button>`;
+  }).join("") : "";
+}
+
+function filtered() {
+  const q = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+  let list = data.products.filter((p) =>
+    (!state.cat || p.category === state.cat) &&
+    (!state.store || p.store === state.store) &&
+    (!state.sale || p.on_sale) &&
+    (state.size == null || p.grams === state.size) &&
+    q.every((w) => (p.name + " " + p.brand).toLowerCase().includes(w)));
+  const by = {
+    price: (a, b) => a.price - b.price,
+    ppg: (a, b) => (a.price_per_gram ?? 1e9) - (b.price_per_gram ?? 1e9),
+    discount: (a, b) => pctOff(b) - pctOff(a) || a.price - b.price,
+    thc: (a, b) => (b.thc ?? -1) - (a.thc ?? -1),
+  }[state.sort];
+  return list.sort(by);
+}
+
+function renderList() {
+  const list = filtered();
+  $("count").textContent = `${list.length.toLocaleString()} products`;
+  $("list").innerHTML = list.length ? list.slice(0, state.shown).map(card).join("")
+    : `<div class="empty">Nothing matches. Try fewer filters.</div>`;
+  $("more").hidden = list.length <= state.shown;
+}
+
+function update(changes) {
+  Object.assign(state, changes, { shown: PAGE });
+  renderControls();
+  renderList();
+}
+
+$("q").addEventListener("input", (e) => update({ q: e.target.value }));
+$("sort").addEventListener("change", (e) => update({ sort: e.target.value }));
+$("store").addEventListener("change", (e) => update({ store: e.target.value }));
+$("sale").addEventListener("change", (e) => update({ sale: e.target.checked }));
+$("cats").addEventListener("click", (e) => {
+  const c = e.target.dataset.cat;
+  if (c) update({ cat: c === "All" ? "" : c, size: null });
+});
+$("sizes").addEventListener("click", (e) => {
+  const v = e.target.dataset.size;
+  if (v !== undefined) update({ size: v === "" ? null : Number(v) });
+});
+$("more").addEventListener("click", () => { state.shown += PAGE; renderList(); });
+
+fetch("data.json", { cache: "no-cache" }).then((r) => r.json()).then((d) => {
+  data = d;
+  data.stores.forEach((s) => (storesById[s.id] = s));
+  $("updated").textContent = "Last checked " + ago(d.generated) + ".";
+  $("store").innerHTML += data.stores.filter((s) => s.count)
+    .map((s) => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+  renderStores();
+  renderBest();
+  update({});
+}).catch(() => {
+  $("list").innerHTML = `<div class="empty">Couldn't load prices. Try again in a minute.</div>`;
+});
+</script>
+</body>
+</html>
