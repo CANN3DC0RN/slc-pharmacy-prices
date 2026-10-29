@@ -31,6 +31,7 @@ def scrape(store):
                 size=p.get("variant"),
                 url=p.get("url"),
                 deal=f"{round(100 * discount / regular)}% off" if discount else "",
+                image=p.get("image_url"),
             )
         nxt = re.search(r'href="(/shop\?after=[^"]+)"', page)
         if not nxt:

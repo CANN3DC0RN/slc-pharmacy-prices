@@ -40,5 +40,7 @@ def scrape(store):
             thc=parse_thc(potency),
             deal=f"{round(100 * discount / regular)}% off" if discount else "",
             strain_type=p.get("dominance"),
+            # imageURL is a signed link that expires in 3h; backupImages are permanent.
+            image=(p.get("backupImages") or [None])[0],
         ))
     return products

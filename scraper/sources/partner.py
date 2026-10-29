@@ -35,6 +35,7 @@ def scrape(store):
                 url=row.get("url") or store["website"],
                 thc=parse_thc("THC " + row["thc"] + "%") if (row.get("thc") or "").strip() else None,
                 deal=row.get("deal"),
+                image=row.get("image"),
             ))
     return products
 

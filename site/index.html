@@ -3,129 +3,337 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SLC Pharmacy Prices</title>
-<meta name="description" content="Compare medical cannabis prices and deals across Salt Lake area pharmacies, updated automatically.">
+<title>SLC Pharmacy Prices · Compare Utah Medical Cannabis Prices</title>
+<meta name="description" content="Compare medical cannabis prices and deals across Salt Lake area pharmacies in one place. Updated automatically throughout the day.">
+<meta property="og:title" content="SLC Pharmacy Prices">
+<meta property="og:description" content="Compare medical cannabis prices and deals across Salt Lake area pharmacies, updated throughout the day.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0f3d2a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f3d2a'/%3E%3Cpath d='M16 25V14M16 14c-5 0-8-3.5-8-8.5 5 0 8 3 8 8.5zm0 0c5 0 8-3.5 8-8.5-5 0-8 3-8 8.5z' stroke='%237ee2a8' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f6f7f4; --card: #ffffff; --text: #1d241f; --muted: #66706a; --line: #e2e6e1;
-  --accent: #2f7d4f; --accent-soft: #e3f1e8; --sale: #c2410c; --sale-soft: #fdecdf;
-  --radius: 12px;
+  --bg: #f7f8f6; --surface: #ffffff; --surface-2: #f1f3ef; --text: #15201a; --muted: #5f6b64; --faint: #8a948e;
+  --line: #e3e7e2; --brand: #0f3d2a; --brand-2: #17603f; --accent: #1f8a55; --accent-soft: #e5f4ec;
+  --sale: #c2410c; --sale-soft: #fff1e6; --img-bg: #ffffff;
+  --shadow: 0 1px 2px rgba(16, 32, 24, .06), 0 4px 16px rgba(16, 32, 24, .06);
+  --shadow-hover: 0 2px 4px rgba(16, 32, 24, .08), 0 12px 28px rgba(16, 32, 24, .12);
+  --radius: 14px; --radius-sm: 10px;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #121614; --card: #1b201d; --text: #e8ece9; --muted: #9aa49e; --line: #2c332e;
-    --accent: #5cc184; --accent-soft: #1f3327; --sale: #fb923c; --sale-soft: #3a2518;
+    --bg: #0e1411; --surface: #161e1a; --surface-2: #1c2621; --text: #e9eeeb; --muted: #a2ada7; --faint: #78847d;
+    --line: #26322c; --accent: #4cc489; --accent-soft: #183326; --sale: #fb923c; --sale-soft: #3a2416; --img-bg: #f4f5f3;
+    --shadow: 0 1px 2px rgba(0,0,0,.3); --shadow-hover: 0 8px 24px rgba(0,0,0,.4);
   }
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text);
-  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-a { color: var(--accent); }
-.wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
-header { padding: 28px 0 12px; }
-h1 { margin: 0; font-size: 26px; letter-spacing: -0.02em; }
-.sub { color: var(--muted); margin: 4px 0 0; }
-h2 { font-size: 17px; margin: 28px 0 10px; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body { margin: 0; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased;
+  font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: inherit; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 720px) { .wrap { padding: 0 24px; } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-.stores { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
-.store { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
-.store b { display: block; }
-.store small { color: var(--muted); display: block; }
-.pill { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 99px; margin-top: 6px;
-  background: var(--accent-soft); color: var(--accent); }
-.pill.wait { background: var(--line); color: var(--muted); }
-.pill.stale { background: var(--sale-soft); color: var(--sale); }
-.promo { margin-top: 8px; font-size: 13px; background: var(--sale-soft); color: var(--sale); border-radius: 8px; padding: 6px 8px; }
+/* Nav */
+.nav { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--brand) 96%, transparent);
+  backdrop-filter: saturate(140%) blur(8px); color: #fff; }
+.nav .wrap { display: flex; align-items: center; gap: 24px; height: 60px; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.02em; text-decoration: none; font-size: 17px; }
+.logo svg { flex: none; }
+.nav nav { margin-left: auto; display: flex; gap: 4px; }
+.nav nav a { text-decoration: none; font-size: 14px; font-weight: 500; opacity: .85; padding: 8px 12px; border-radius: 8px; }
+.nav nav a:hover { opacity: 1; background: rgba(255,255,255,.08); }
+.logo, .nav nav a { white-space: nowrap; }
+@media (max-width: 640px) {
+  .nav nav a:not(.primary) { display: none; }
+  .nav .wrap { gap: 12px; }
+  .nav .logo { font-size: 15px; }
+  .nav nav a.primary { padding: 7px 12px; font-size: 13px; }
+}
+.nav nav a.primary { background: #7ee2a8; color: var(--brand); opacity: 1; font-weight: 600; }
 
-.best { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+/* Hero */
+.hero { background: radial-gradient(1200px 400px at 85% -10%, #1f7a4f 0%, transparent 60%), linear-gradient(180deg, var(--brand) 0%, #0b2e20 100%);
+  color: #fff; padding: 56px 0 64px; }
+.hero h1 { font-size: clamp(30px, 5vw, 48px); line-height: 1.08; letter-spacing: -.035em; margin: 0 0 14px; max-width: 760px; font-weight: 800; }
+.hero h1 em { font-style: normal; color: #7ee2a8; }
+.hero p { margin: 0 0 28px; font-size: 17px; color: rgba(255,255,255,.78); max-width: 620px; }
+.search { display: flex; background: #fff; border-radius: 14px; padding: 6px; max-width: 640px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+.search svg { flex: none; margin: 0 4px 0 12px; align-self: center; color: #6b766f; }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; padding: 12px 8px; font-size: 16px; color: #15201a; background: transparent; }
+.search button { border: 0; background: var(--accent); color: #fff; font-weight: 600; padding: 0 22px; border-radius: 10px; cursor: pointer; }
+.search button:hover { background: #197a4a; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 28px; font-size: 14px; color: rgba(255,255,255,.75); }
+.stats b { color: #fff; font-size: 20px; display: block; letter-spacing: -.02em; }
+.live { display: inline-flex; align-items: center; gap: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #7ee2a8; box-shadow: 0 0 0 4px rgba(126,226,168,.2); flex: none; }
 
-.controls { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 12px 0; border-bottom: 1px solid var(--line); }
-.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.row + .row { margin-top: 8px; }
-input[type=search], select { font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--line);
-  border-radius: 8px; padding: 8px 10px; }
-input[type=search] { flex: 1 1 220px; min-width: 0; }
-.chip { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--card); color: var(--text);
-  border-radius: 99px; padding: 5px 12px; cursor: pointer; }
-.chip[aria-pressed=true] { background: var(--accent); border-color: var(--accent); color: #fff; }
-label.check { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+/* Sections */
+section { padding: 48px 0 0; }
+.head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.head h2 { margin: 0; font-size: 24px; letter-spacing: -.025em; }
+.head p { margin: 4px 0 0; color: var(--muted); }
+.link { color: var(--accent); font-weight: 600; text-decoration: none; font-size: 14px; white-space: nowrap; }
+.link:hover { text-decoration: underline; }
 
-.count { color: var(--muted); font-size: 13px; margin: 12px 0 8px; }
-.list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
-.item { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px;
-  display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: inherit; }
-.item:hover { border-color: var(--accent); }
-.item .brand { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-.item .name { font-weight: 600; }
-.item .meta { font-size: 13px; color: var(--muted); }
-.price { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 6px; flex-wrap: wrap; }
-.price strong { font-size: 20px; font-variant-numeric: tabular-nums; }
-.price s { color: var(--muted); font-size: 13px; }
-.price .ppg { font-size: 12px; color: var(--muted); margin-left: auto; }
-.badge { font-size: 12px; font-weight: 600; color: var(--sale); background: var(--sale-soft); border-radius: 6px; padding: 1px 6px; }
-.where { font-size: 13px; color: var(--accent); font-weight: 600; }
-.more { display: block; margin: 16px auto; }
-footer { color: var(--muted); font-size: 13px; padding: 32px 0 48px; border-top: 1px solid var(--line); margin-top: 32px; }
-.empty { padding: 32px; text-align: center; color: var(--muted); }
+/* Category tiles */
+.cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.cat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; cursor: pointer;
+  text-align: left; display: flex; flex-direction: column; gap: 2px; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.cat:hover { border-color: var(--accent); box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.cat .ic { width: 40px; height: 40px; border-radius: 10px; background: var(--accent-soft); color: var(--accent);
+  display: grid; place-items: center; margin-bottom: 10px; }
+.cat b { font-size: 15px; }
+.cat span { font-size: 13px; color: var(--muted); }
+
+/* Product cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; text-decoration: none;
+  display: flex; flex-direction: column; box-shadow: var(--shadow); transition: box-shadow .15s, transform .15s, border-color .15s; }
+.card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.thumb { position: relative; aspect-ratio: 4 / 3; background: var(--img-bg); display: grid; place-items: center; border-bottom: 1px solid var(--line); }
+.thumb img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
+.thumb .ph { color: #b9c2bc; }
+.tag { position: absolute; top: 10px; left: 10px; background: var(--sale); color: #fff; font-size: 12px; font-weight: 700;
+  padding: 3px 8px; border-radius: 6px; letter-spacing: .01em; }
+.body { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.brand { font-size: 11px; font-weight: 600; color: var(--faint); text-transform: uppercase; letter-spacing: .07em; }
+.name { font-weight: 600; font-size: 15px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip-s { font-size: 12px; color: var(--muted); background: var(--surface-2); border-radius: 6px; padding: 2px 7px; }
+.price { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 8px; flex-wrap: wrap; }
+.price strong { font-size: 22px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.price s { color: var(--faint); font-size: 14px; }
+.ppg { margin-left: auto; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.store-line { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); padding-top: 10px; border-top: 1px solid var(--line); margin-top: 8px; }
+.store-line .dot { width: 6px; height: 6px; box-shadow: none; background: var(--accent); }
+.store-line span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid .body { padding: 10px; gap: 4px; }
+  .grid .name { font-size: 14px; }
+  .grid .price strong { font-size: 18px; }
+  .grid .ppg { margin-left: 0; width: 100%; }
+  .grid .chip-s:nth-child(n+2) { display: none; }
+  .grid .store-line { font-size: 12px; }
+  .grid .thumb img { padding: 6px; }
+  .cats { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cat .ic { margin-bottom: 6px; }
+}
+
+/* Deals carousel */
+.rail { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 1fr); gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 4px 2px 16px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.rail .card { scroll-snap-align: start; }
+@media (min-width: 1000px) { .rail { grid-auto-columns: calc((100% - 64px) / 5); } }
+
+/* Compare layout */
+.layout { display: grid; gap: 24px; }
+@media (min-width: 900px) { .layout { grid-template-columns: 240px 1fr; align-items: start; } }
+.filters { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 4px 16px 16px; }
+@media (min-width: 900px) { .filters { position: sticky; top: 76px; } }
+.filters summary { list-style: none; cursor: pointer; font-weight: 600; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+.filters summary::-webkit-details-marker { display: none; }
+.filters[open] summary .chev { transform: rotate(180deg); }
+.fgroup { padding: 12px 0; border-top: 1px solid var(--line); }
+.fgroup h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--faint); margin: 0 0 8px; }
+.opt { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 14px; cursor: pointer; }
+.opt input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+.opt .n { margin-left: auto; color: var(--faint); font-size: 12px; font-variant-numeric: tabular-nums; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 4px 12px; font-size: 13px; cursor: pointer; }
+.pill[aria-pressed=true] { background: var(--brand-2); border-color: var(--brand-2); color: #fff; }
+.toggle { display: flex; align-items: center; justify-content: space-between; font-size: 14px; cursor: pointer; }
+.toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+.clear { margin-top: 12px; width: 100%; border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 8px; cursor: pointer; font-size: 13px; font-weight: 500; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+.toolbar .q { flex: 1 1 240px; display: flex; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; }
+.toolbar .q svg { color: var(--faint); flex: none; }
+.toolbar .q input { border: 0; outline: 0; background: transparent; padding: 10px 8px; width: 100%; }
+.toolbar select { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.count { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+.more { display: block; margin: 28px auto 0; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px 24px; font-weight: 600; cursor: pointer; }
+.more:hover { border-color: var(--accent); color: var(--accent); }
+.empty { grid-column: 1 / -1; text-align: center; padding: 56px 16px; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); }
+.skeleton { background: linear-gradient(90deg, var(--surface-2), var(--surface), var(--surface-2)); background-size: 200% 100%;
+  animation: sh 1.2s infinite; border-radius: var(--radius); height: 320px; }
+@keyframes sh { to { background-position: -200% 0; } }
+
+/* Pharmacies */
+.stores { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.store { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 6px; }
+.store h3 { margin: 0; font-size: 17px; letter-spacing: -.01em; }
+.store .addr { color: var(--muted); font-size: 14px; }
+.status { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; margin-top: 6px; }
+.status .dot { box-shadow: none; width: 8px; height: 8px; background: var(--accent); }
+.status.soon .dot { background: var(--faint); }
+.status.stale .dot { background: var(--sale); }
+.status.soon { color: var(--muted); }
+.store .links { display: flex; gap: 16px; margin-top: auto; padding-top: 12px; }
+.promo { background: var(--sale-soft); color: var(--sale); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+
+/* CTA + footer */
+.cta { margin-top: 56px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 32px;
+  display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; }
+.cta h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.02em; }
+.cta p { margin: 0; color: var(--muted); max-width: 560px; }
+.btn { display: inline-block; background: var(--brand); color: #fff; text-decoration: none; font-weight: 600; padding: 12px 20px; border-radius: 10px; }
+.btn:hover { background: var(--brand-2); }
+footer { margin-top: 56px; background: var(--brand); color: rgba(255,255,255,.7); padding: 40px 0; font-size: 13px; }
+footer .wrap { display: grid; gap: 20px; }
+@media (min-width: 720px) { footer .wrap { grid-template-columns: 1fr 2fr; } }
+footer .logo { color: #fff; margin-bottom: 8px; }
+footer p { margin: 0 0 8px; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>SLC Pharmacy Prices</h1>
-    <p class="sub">Medical cannabis prices and deals from Salt Lake area pharmacies, in one place. <span id="updated"></span></p>
-  </header>
 
-  <h2>Pharmacies</h2>
-  <div class="stores" id="stores"></div>
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="SLC Pharmacy Prices home">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#17603f"/><path d="M16 25V14M16 14c-5 0-8-3.5-8-8.5 5 0 8 3 8 8.5zm0 0c5 0 8-3.5 8-8.5-5 0-8 3-8 8.5z" stroke="#7ee2a8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      SLC Pharmacy Prices
+    </a>
+    <nav aria-label="Main">
+      <a href="#deals">Deals</a>
+      <a href="#pharmacies">Pharmacies</a>
+      <a href="#for-pharmacies">For pharmacies</a>
+      <a class="primary" href="#compare">Compare prices</a>
+    </nav>
+  </div>
+</header>
 
-  <h2>Biggest discounts right now</h2>
-  <div class="best" id="best"></div>
-
-  <h2 id="browse">Compare prices</h2>
-  <div class="controls">
-    <div class="row">
-      <input type="search" id="q" placeholder="Search strain, brand or product…" aria-label="Search products">
-      <select id="sort" aria-label="Sort by">
-        <option value="price">Lowest price</option>
-        <option value="ppg">Lowest price per gram</option>
-        <option value="discount">Biggest discount</option>
-        <option value="thc">Highest THC</option>
-      </select>
-      <select id="store" aria-label="Pharmacy"><option value="">All pharmacies</option></select>
-    </div>
-    <div class="row" id="cats"></div>
-    <div class="row">
-      <span id="sizes" class="row"></span>
-      <label class="check"><input type="checkbox" id="sale"> On sale only</label>
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <h1>Find the best medical cannabis prices in <em>Salt Lake</em>.</h1>
+      <p>Compare prices and deals across Salt Lake area pharmacies in one place, so you know where to shop before you go.</p>
+      <form class="search" id="heroSearch" role="search">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <label class="sr" for="heroQ">Search products</label>
+        <input id="heroQ" type="search" placeholder="Search a strain, brand or product" autocomplete="off">
+        <button type="submit">Search</button>
+      </form>
+      <div class="stats" id="stats" aria-live="polite"></div>
     </div>
   </div>
-  <div class="count" id="count"></div>
-  <div class="list" id="list"></div>
-  <button class="chip more" id="more" hidden>Show more</button>
 
-  <footer>
-    Prices come from each pharmacy's online menu and are checked automatically several times a day.
-    Always confirm price and availability with the pharmacy before you go. For Utah medical cannabis
-    cardholders. Not affiliated with any pharmacy listed.
-    <br><br>Run a pharmacy and want your prices listed? Get in touch.
-  </footer>
-</div>
+  <div class="wrap">
+    <section aria-labelledby="catsH">
+      <div class="head"><div><h2 id="catsH">Shop by category</h2><p>Lowest price currently available in each category.</p></div></div>
+      <div class="cats" id="cats"></div>
+    </section>
+
+    <section id="deals" aria-labelledby="dealsH">
+      <div class="head">
+        <div><h2 id="dealsH">Today's best deals</h2><p>Biggest discounts across all pharmacies right now.</p></div>
+        <a class="link" href="#compare" id="allDeals">See all deals →</a>
+      </div>
+      <div class="rail" id="best"></div>
+    </section>
+
+    <section id="compare" aria-labelledby="cmpH">
+      <div class="head"><div><h2 id="cmpH">Compare prices</h2><p>Filter, sort, and tap any product to view it at the pharmacy.</p></div></div>
+      <div class="layout">
+        <details class="filters" id="filters">
+          <summary>Filters <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="fgroup"><h3>Category</h3><div id="fCat"></div></div>
+          <div class="fgroup" id="fSizeWrap"><h3>Size</h3><div class="pills" id="fSize"></div></div>
+          <div class="fgroup"><h3>Pharmacy</h3><div id="fStore"></div></div>
+          <div class="fgroup"><label class="toggle">On sale only <input type="checkbox" id="fSale"></label></div>
+          <button class="clear" id="clear" type="button">Clear all filters</button>
+        </details>
+        <div>
+          <div class="toolbar">
+            <label class="q">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <span class="sr">Search products</span>
+              <input type="search" id="q" placeholder="Search strain, brand or product" autocomplete="off">
+            </label>
+            <label class="sr" for="sort">Sort by</label>
+            <select id="sort">
+              <option value="price">Price: low to high</option>
+              <option value="ppg">Price per gram: low to high</option>
+              <option value="discount">Biggest discount</option>
+              <option value="thc">THC: high to low</option>
+            </select>
+          </div>
+          <div class="count" id="count" aria-live="polite"></div>
+          <div class="grid" id="list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+          <button class="more" id="more" type="button" hidden>Show more</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="pharmacies" aria-labelledby="phH">
+      <div class="head"><div><h2 id="phH">Pharmacies</h2><p>Salt Lake area pharmacies we track. More coming soon.</p></div></div>
+      <div class="stores" id="stores"></div>
+    </section>
+
+    <div class="cta" id="for-pharmacies">
+      <div>
+        <h2>Run a Salt Lake pharmacy?</h2>
+        <p>Get your menu and specials in front of patients who are comparing prices right now. Listing is free. Send us your menu and we'll handle the rest.</p>
+      </div>
+      <a class="btn" id="ctaBtn" href="#" hidden>Get listed free</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="logo">
+        <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#17603f"/><path d="M16 25V14M16 14c-5 0-8-3.5-8-8.5 5 0 8 3 8 8.5zm0 0c5 0 8-3.5 8-8.5-5 0-8 3-8 8.5z" stroke="#7ee2a8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        SLC Pharmacy Prices
+      </div>
+      <p>© <span id="yr"></span> SLC Pharmacy Prices</p>
+    </div>
+    <div>
+      <p>Prices come from each pharmacy's online menu and are checked automatically throughout the day. Prices and availability can change, so always confirm with the pharmacy before you go.</p>
+      <p>For Utah medical cannabis cardholders. We don't sell anything and aren't affiliated with any pharmacy listed.</p>
+    </div>
+  </div>
+</footer>
 
 <script>
-const PAGE = 60;
-const SIZES = { Flower: [1, 3.5, 7, 14, 28] };
-const state = { q: "", cat: "Flower", store: "", sale: false, sort: "price", size: null, shown: PAGE };
+// Set this to your contact email to show the "Get listed free" button.
+const CONTACT_EMAIL = "";
+
+const PAGE = 48;
+const ORDER = ["Flower", "Vapes", "Concentrates", "Edibles", "Tinctures", "Topicals", "Accessories"];
+const SIZES = { Flower: [1, 3.5, 7, 14, 28], Vapes: [0.5, 1, 2], Concentrates: [0.5, 1] };
+const ICONS = {
+  Flower: '<path d="M12 21v-8M12 13c-4.5 0-7-3-7-7.5 4.5 0 7 2.8 7 7.5zm0 0c4.5 0 7-3 7-7.5-4.5 0-7 2.8-7 7.5z"/>',
+  Vapes: '<rect x="9" y="3" width="6" height="18" rx="2"/><path d="M9 8h6M12 17v1"/>',
+  Concentrates: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+  Edibles: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 9h.01M15 15h.01M15 9h.01M9 15h.01"/>',
+  Tinctures: '<path d="M10 2h4v4h-4zM8 6h8l1 3v11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9z"/><path d="M7 13h10"/>',
+  Topicals: '<rect x="5" y="9" width="14" height="12" rx="2"/><path d="M7 9V6h10v3"/>',
+  Accessories: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',
+};
+const icon = (cat, size = 22) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[cat] || ICONS.Accessories}</svg>`;
+
+// Start on Flower: across all categories, $1 accessories crowd the top of a price sort.
+const state = { q: "", cat: "Flower", stores: new Set(), sale: false, sort: "price", size: null, shown: PAGE };
 let data, storesById = {};
 
 const $ = (id) => document.getElementById(id);
-const money = (n) => "$" + n.toFixed(2).replace(/\.00$/, "");
+const money = (n) => "$" + (Number.isInteger(n) ? n : n.toFixed(2));
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const pctOff = (p) => (p.regular_price > p.price ? Math.round(100 * (1 - p.price / p.regular_price)) : 0);
+const fmtG = (g) => (g === 0.5 ? "½" : g) + "g";
 
 function ago(iso) {
   if (!iso) return "never";
-  const m = Math.round((Date.now() - new Date(iso)) / 60000);
+  const m = Math.max(0, Math.round((Date.now() - new Date(iso)) / 60000));
+  if (m < 1) return "just now";
   if (m < 60) return m + " min ago";
   if (m < 48 * 60) return Math.round(m / 60) + " hr ago";
   return Math.round(m / 1440) + " days ago";
@@ -134,112 +342,162 @@ function ago(iso) {
 function card(p) {
   const s = storesById[p.store] || {};
   const off = pctOff(p);
-  const meta = [p.size, p.strain_type, p.thc != null ? p.thc + "% THC" : ""].filter(Boolean).join(" · ");
-  return `<a class="item" href="${esc(p.url || s.website)}" target="_blank" rel="noopener">
-    <span class="brand">${esc(p.brand || p.category)}</span>
-    <span class="name">${esc(p.name)}</span>
-    ${meta ? `<span class="meta">${esc(meta)}</span>` : ""}
-    <span class="where">${esc(s.name)} · ${esc(s.city)}</span>
-    <span class="price"><strong>${money(p.price)}</strong>
-      ${off ? `<s>${money(p.regular_price)}</s><span class="badge">${off}% off</span>` : ""}
-      ${p.price_per_gram ? `<span class="ppg">${money(p.price_per_gram)}/g</span>` : ""}</span>
+  const chips = [p.size, p.strain_type, p.thc != null ? p.thc + "% THC" : ""].filter(Boolean);
+  const img = p.image
+    ? `<img src="${esc(p.image)}" alt="" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',innerHTML:this.dataset.ph}))" data-ph='${icon(p.category, 44)}'>`
+    : `<span class="ph">${icon(p.category, 44)}</span>`;
+  return `<a class="card" href="${esc(p.url || s.website)}" target="_blank" rel="noopener">
+    <div class="thumb">${img}${off ? `<span class="tag">${off}% off</span>` : ""}</div>
+    <div class="body">
+      <span class="brand">${esc(p.brand || p.category)}</span>
+      <span class="name">${esc(p.name)}</span>
+      ${chips.length ? `<span class="chips">${chips.map((c) => `<span class="chip-s">${esc(c)}</span>`).join("")}</span>` : ""}
+      <span class="price"><strong>${money(p.price)}</strong>${off ? `<s>${money(p.regular_price)}</s>` : ""}
+        ${p.price_per_gram ? `<span class="ppg">${money(p.price_per_gram)}/g</span>` : ""}</span>
+      <span class="store-line"><span class="dot"></span><span>${esc(s.name)} · ${esc(s.city)}</span></span>
+    </div>
   </a>`;
+}
+
+function renderStats() {
+  const live = data.stores.filter((s) => s.count).length;
+  const sale = data.products.filter((p) => p.on_sale).length;
+  $("stats").innerHTML = `
+    <div><b>${data.products.length.toLocaleString()}</b>products compared</div>
+    <div><b>${live}</b>pharmacies with live prices</div>
+    <div><b>${sale.toLocaleString()}</b>items on sale</div>
+    <div class="live"><span class="dot"></span>Updated ${ago(data.generated)}</div>`;
+}
+
+function renderCats() {
+  const by = {};
+  for (const p of data.products) (by[p.category] ||= []).push(p.price);
+  $("cats").innerHTML = ORDER.filter((c) => by[c]).map((c) =>
+    `<button class="cat" type="button" data-cat="${c}"><span class="ic">${icon(c)}</span><b>${c}</b>
+      <span>${by[c].length} items · from ${money(Math.min(...by[c]))}</span></button>`).join("");
+}
+
+function renderBest() {
+  // Several top discounts per category so the rail isn't all one product type.
+  const byCat = {};
+  for (const p of data.products) if (p.category !== "Accessories" && pctOff(p) >= 10) (byCat[p.category] ||= []).push(p);
+  const picks = [];
+  for (const list of Object.values(byCat)) picks.push(...list.sort((a, b) => pctOff(b) - pctOff(a)).slice(0, 3));
+  picks.sort((a, b) => pctOff(b) - pctOff(a));
+  $("best").innerHTML = picks.length ? picks.slice(0, 12).map(card).join("") : `<div class="empty">No sales found right now. Check back soon.</div>`;
 }
 
 function renderStores() {
   $("stores").innerHTML = data.stores.map((s) => {
     const promos = data.deals.filter((d) => d.store === s.id);
-    let pill;
-    if (s.count && s.ok) pill = `<span class="pill">${s.count} prices · ${ago(s.updated)}</span>`;
-    else if (s.count) pill = `<span class="pill stale">${s.count} prices · last good ${ago(s.updated)}</span>`;
-    else pill = `<span class="pill wait">Prices coming soon</span>`;
-    return `<div class="store"><b>${esc(s.name)}</b><small>${esc(s.address)}</small>
-      <small><a href="${esc(s.website)}" target="_blank" rel="noopener">Pharmacy website</a></small>${pill}
-      ${promos.map((d) => `<div class="promo"><b>${esc(d.title)}</b>${d.details ? "<br>" + esc(d.details) : ""}</div>`).join("")}</div>`;
+    let status;
+    if (s.count && s.ok) status = `<span class="status"><span class="dot"></span>${s.count.toLocaleString()} live prices · updated ${ago(s.updated)}</span>`;
+    else if (s.count) status = `<span class="status stale"><span class="dot"></span>Showing prices from ${ago(s.updated)}</span>`;
+    else status = `<span class="status soon"><span class="dot"></span>Prices coming soon</span>`;
+    const map = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(s.name + " " + s.address);
+    return `<div class="store"><h3>${esc(s.name)}</h3><div class="addr">${esc(s.address)}</div>${status}
+      ${promos.map((d) => `<div class="promo"><b>${esc(d.title)}</b>${d.details ? "<br>" + esc(d.details) : ""}</div>`).join("")}
+      <div class="links"><a class="link" href="${esc(s.website)}" target="_blank" rel="noopener">Website</a>
+      <a class="link" href="${map}" target="_blank" rel="noopener">Directions</a>
+      ${s.count ? `<a class="link" href="#compare" data-store="${esc(s.id)}">See prices</a>` : ""}</div></div>`;
   }).join("");
 }
 
-function renderBest() {
-  // Top discount per category, so the strip isn't all one product type.
-  const best = {};
-  for (const p of data.products) {
-    if (p.category === "Accessories") continue;
-    const off = pctOff(p);
-    if (off && (!best[p.category] || off > pctOff(best[p.category]))) best[p.category] = p;
-  }
-  const picks = Object.values(best).sort((a, b) => pctOff(b) - pctOff(a)).slice(0, 6);
-  $("best").innerHTML = picks.length ? picks.map(card).join("") : `<div class="empty">No sales found right now.</div>`;
-}
-
-function renderControls() {
-  const cats = ["All", ...new Set(data.products.map((p) => p.category))];
-  const order = ["All", "Flower", "Vapes", "Concentrates", "Edibles", "Tinctures", "Topicals", "Accessories"];
-  cats.sort((a, b) => order.indexOf(a) - order.indexOf(b));
-  $("cats").innerHTML = cats.map((c) =>
-    `<button class="chip" data-cat="${esc(c)}" aria-pressed="${(state.cat || "All") === c}">${esc(c)}</button>`).join("");
-  const sizes = SIZES[state.cat] || [];
-  $("sizes").innerHTML = sizes.length ? ["Any size", ...sizes].map((g) => {
-    const v = g === "Any size" ? "" : g;
-    return `<button class="chip" data-size="${v}" aria-pressed="${String(state.size ?? "") === String(v)}">${g === "Any size" ? g : g + "g"}</button>`;
-  }).join("") : "";
-}
-
-function filtered() {
-  const q = state.q.toLowerCase().split(/\s+/).filter(Boolean);
-  let list = data.products.filter((p) =>
-    (!state.cat || p.category === state.cat) &&
-    (!state.store || p.store === state.store) &&
+function inScope(p, skip) {
+  return (skip === "cat" || !state.cat || p.category === state.cat) &&
+    (skip === "store" || !state.stores.size || state.stores.has(p.store)) &&
     (!state.sale || p.on_sale) &&
-    (state.size == null || p.grams === state.size) &&
-    q.every((w) => (p.name + " " + p.brand).toLowerCase().includes(w)));
-  const by = {
-    price: (a, b) => a.price - b.price,
-    ppg: (a, b) => (a.price_per_gram ?? 1e9) - (b.price_per_gram ?? 1e9),
-    discount: (a, b) => pctOff(b) - pctOff(a) || a.price - b.price,
-    thc: (a, b) => (b.thc ?? -1) - (a.thc ?? -1),
-  }[state.sort];
-  return list.sort(by);
+    (skip === "size" || state.size == null || p.grams === state.size) &&
+    state.q.toLowerCase().split(/\s+/).filter(Boolean).every((w) => (p.name + " " + p.brand).toLowerCase().includes(w));
+}
+
+function renderFilters() {
+  const count = (skip, key) => data.products.reduce((m, p) => (inScope(p, skip) && (m[key(p)] = (m[key(p)] || 0) + 1), m), {});
+  const cc = count("cat", (p) => p.category);
+  const total = Object.values(cc).reduce((a, b) => a + b, 0);
+  $("fCat").innerHTML = [["", "All categories", total], ...ORDER.filter((c) => cc[c] || state.cat === c).map((c) => [c, c, cc[c] || 0])]
+    .map(([v, label, n]) => `<label class="opt"><input type="radio" name="cat" value="${v}" ${state.cat === v ? "checked" : ""}> ${label}<span class="n">${n}</span></label>`).join("");
+  const sc = count("store", (p) => p.store);
+  $("fStore").innerHTML = data.stores.filter((s) => s.count).map((s) =>
+    `<label class="opt"><input type="checkbox" value="${esc(s.id)}" ${state.stores.has(s.id) ? "checked" : ""}> ${esc(s.name)}<span class="n">${sc[s.id] || 0}</span></label>`).join("");
+  const sizes = SIZES[state.cat] || [];
+  $("fSizeWrap").hidden = !sizes.length;
+  $("fSize").innerHTML = ["", ...sizes].map((g) =>
+    `<button class="pill" type="button" data-size="${g}" aria-pressed="${String(state.size ?? "") === String(g)}">${g === "" ? "Any" : fmtG(g)}</button>`).join("");
+  $("fSale").checked = state.sale;
+  $("sort").value = state.sort;
+  if ($("q").value !== state.q) $("q").value = state.q;
 }
 
 function renderList() {
-  const list = filtered();
-  $("count").textContent = `${list.length.toLocaleString()} products`;
+  const by = {
+    price: (a, b) => a.price - b.price,
+    ppg: (a, b) => (a.price_per_gram ?? 1e9) - (b.price_per_gram ?? 1e9) || a.price - b.price,
+    discount: (a, b) => pctOff(b) - pctOff(a) || a.price - b.price,
+    thc: (a, b) => (b.thc ?? -1) - (a.thc ?? -1),
+  }[state.sort];
+  const list = data.products.filter((p) => inScope(p)).sort(by);
+  $("count").textContent = `${list.length.toLocaleString()} ${list.length === 1 ? "product" : "products"}`;
   $("list").innerHTML = list.length ? list.slice(0, state.shown).map(card).join("")
-    : `<div class="empty">Nothing matches. Try fewer filters.</div>`;
+    : `<div class="empty">No products match those filters.<br>Try removing a filter or searching for something else.</div>`;
   $("more").hidden = list.length <= state.shown;
+  if (!$("more").hidden) $("more").textContent = `Show more (${(list.length - state.shown).toLocaleString()} left)`;
 }
 
-function update(changes) {
+function update(changes = {}) {
   Object.assign(state, changes, { shown: PAGE });
-  renderControls();
+  if ("cat" in changes && !(SIZES[state.cat] || []).includes(state.size)) state.size = null;
+  renderFilters();
   renderList();
 }
 
+const goCompare = () => $("compare").scrollIntoView();
+
+$("heroSearch").addEventListener("submit", (e) => { e.preventDefault(); update({ q: $("heroQ").value.trim() }); goCompare(); });
 $("q").addEventListener("input", (e) => update({ q: e.target.value }));
 $("sort").addEventListener("change", (e) => update({ sort: e.target.value }));
-$("store").addEventListener("change", (e) => update({ store: e.target.value }));
-$("sale").addEventListener("change", (e) => update({ sale: e.target.checked }));
-$("cats").addEventListener("click", (e) => {
-  const c = e.target.dataset.cat;
-  if (c) update({ cat: c === "All" ? "" : c, size: null });
+$("fSale").addEventListener("change", (e) => update({ sale: e.target.checked }));
+$("fCat").addEventListener("change", (e) => update({ cat: e.target.value }));
+$("fStore").addEventListener("change", (e) => {
+  e.target.checked ? state.stores.add(e.target.value) : state.stores.delete(e.target.value);
+  update();
 });
-$("sizes").addEventListener("click", (e) => {
-  const v = e.target.dataset.size;
+$("fSize").addEventListener("click", (e) => {
+  const v = e.target.closest("[data-size]")?.dataset.size;
   if (v !== undefined) update({ size: v === "" ? null : Number(v) });
 });
+$("clear").addEventListener("click", () => { state.stores.clear(); update({ q: "", cat: "", sale: false, size: null }); });
+$("cats").addEventListener("click", (e) => {
+  const c = e.target.closest("[data-cat]")?.dataset.cat;
+  if (c) { update({ cat: c }); goCompare(); }
+});
+$("allDeals").addEventListener("click", () => update({ sale: true, sort: "discount", cat: "" }));
+$("stores").addEventListener("click", (e) => {
+  const id = e.target.closest("[data-store]")?.dataset.store;
+  if (id) { state.stores = new Set([id]); update(); }
+});
 $("more").addEventListener("click", () => { state.shown += PAGE; renderList(); });
+
+$("yr").textContent = new Date().getFullYear();
+if (CONTACT_EMAIL) {
+  $("ctaBtn").href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent("List my pharmacy on SLC Pharmacy Prices");
+  $("ctaBtn").hidden = false;
+}
+// Open the filter panel on wide screens; it collapses on phones.
+const wide = matchMedia("(min-width: 900px)");
+$("filters").open = wide.matches;
+wide.addEventListener("change", (e) => ($("filters").open = e.matches));
 
 fetch("data.json", { cache: "no-cache" }).then((r) => r.json()).then((d) => {
   data = d;
   data.stores.forEach((s) => (storesById[s.id] = s));
-  $("updated").textContent = "Last checked " + ago(d.generated) + ".";
-  $("store").innerHTML += data.stores.filter((s) => s.count)
-    .map((s) => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
-  renderStores();
+  renderStats();
+  renderCats();
   renderBest();
-  update({});
+  renderStores();
+  update();
 }).catch(() => {
-  $("list").innerHTML = `<div class="empty">Couldn't load prices. Try again in a minute.</div>`;
+  $("list").innerHTML = `<div class="empty">Couldn't load prices right now. Please refresh in a minute.</div>`;
 });
 </script>
 </body>

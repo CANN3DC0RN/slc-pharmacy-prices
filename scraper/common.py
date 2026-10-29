@@ -76,7 +76,7 @@ def parse_thc(*texts):
 
 
 def make_product(store_id, name, brand, category, price, regular_price=None,
-                 size=None, url=None, thc=None, deal=None, strain_type=None):
+                 size=None, url=None, thc=None, deal=None, strain_type=None, image=None):
     price = round(float(price), 2)
     regular = round(float(regular_price), 2) if regular_price else price
     # Per-gram pricing only means something for smokable/vapeable product.
@@ -96,4 +96,5 @@ def make_product(store_id, name, brand, category, price, regular_price=None,
         "thc": thc,
         "strain_type": (strain_type or "").title(),
         "url": url or "",
+        "image": image or "",
     }
