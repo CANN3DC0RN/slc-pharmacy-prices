@@ -1,2 +1,2 @@
-name,brand,category,size,price,sale_price,deal,thc,url,expires,image
-Example Strain 3.5g Flower,Example Brand,Flower,3.5g,45.00,36.00,20% off this week,22.5,,2026-12-31,
+name,brand,category,size,price,sale_price,deal,thc,url,expires,image,strain_type,collected
+Example Strain 3.5g Flower,Example Brand,Flower,3.5g,45.00,36.00,20% off this week,22.5,,2026-12-31,,Hybrid,

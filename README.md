@@ -13,6 +13,12 @@ Every 4 hours, a free GitHub job collects the latest prices and republishes the 
 
 If an automatic store's website changes and the read fails, the site keeps showing that store's last good prices and labels them "last good …".
 
+## Saving prices by hand (the "Save prices" bookmark)
+
+Dutchie blocks automatic reading, so for Beehive, The Forest and Bloc you save their prices while you browse:
+open `save-prices.html` on the live site and follow the three steps (add bookmark → click it on the menu → upload the file).
+Hand-saved prices show "checked X days ago", and they're hidden once they're more than 14 days old.
+
 ## Adding a partner pharmacy's prices
 
 1. Copy `partners/TEMPLATE.csv` to `partners/<store-id>.csv` (ids are in `stores.json`, e.g. `beehive-slc.csv`).

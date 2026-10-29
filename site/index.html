@@ -339,6 +339,12 @@ function ago(iso) {
   return Math.round(m / 1440) + " days ago";
 }
 
+// Hand-saved prices carry a plain date (YYYY-MM-DD), not a time.
+function daysAgo(date) {
+  const d = Math.round((new Date(new Date().toDateString()) - new Date(date + "T00:00")) / 86400000);
+  return d <= 0 ? "today" : d === 1 ? "yesterday" : d + " days ago";
+}
+
 function card(p) {
   const s = storesById[p.store] || {};
   const off = pctOff(p);
@@ -364,7 +370,7 @@ function renderStats() {
   const sale = data.products.filter((p) => p.on_sale).length;
   $("stats").innerHTML = `
     <div><b>${data.products.length.toLocaleString()}</b>products compared</div>
-    <div><b>${live}</b>pharmacies with live prices</div>
+    <div><b>${live}</b>pharmacies with prices</div>
     <div><b>${sale.toLocaleString()}</b>items on sale</div>
     <div class="live"><span class="dot"></span>Updated ${ago(data.generated)}</div>`;
 }
@@ -391,7 +397,8 @@ function renderStores() {
   $("stores").innerHTML = data.stores.map((s) => {
     const promos = data.deals.filter((d) => d.store === s.id);
     let status;
-    if (s.count && s.ok) status = `<span class="status"><span class="dot"></span>${s.count.toLocaleString()} live prices · updated ${ago(s.updated)}</span>`;
+    if (s.count && s.ok && !s.automatic) status = `<span class="status"><span class="dot"></span>${s.count.toLocaleString()} prices · checked ${s.updated && s.updated.length === 10 ? daysAgo(s.updated) : ago(s.updated)}</span>`;
+    else if (s.count && s.ok) status = `<span class="status"><span class="dot"></span>${s.count.toLocaleString()} live prices · updated ${ago(s.updated)}</span>`;
     else if (s.count) status = `<span class="status stale"><span class="dot"></span>Showing prices from ${ago(s.updated)}</span>`;
     else status = `<span class="status soon"><span class="dot"></span>Prices coming soon</span>`;
     const map = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(s.name + " " + s.address);

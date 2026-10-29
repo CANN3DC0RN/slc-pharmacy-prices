@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Save Prices · SLC Pharmacy Prices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #f7f8f6; --surface: #fff; --text: #15201a; --muted: #5f6b64; --line: #e3e7e2; --brand: #0f3d2a; --accent: #1f8a55; --accent-soft: #e5f4ec; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0e1411; --surface: #161e1a; --text: #e9eeeb; --muted: #a2ada7; --line: #26322c; --accent: #4cc489; --accent-soft: #183326; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 Inter, system-ui, sans-serif; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+a { color: var(--accent); }
+h1 { font-size: 30px; letter-spacing: -.03em; margin: 0 0 6px; }
+.sub { color: var(--muted); margin: 0 0 28px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 14px; display: grid; grid-template-columns: 36px 1fr; gap: 14px; }
+.n { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; display: grid; place-items: center; }
+.step h2 { font-size: 17px; margin: 4px 0 6px; }
+.step p { margin: 0 0 8px; color: var(--muted); }
+.bm { display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: #fff; text-decoration: none; font-weight: 700;
+  padding: 12px 18px; border-radius: 10px; cursor: grab; margin: 6px 0; }
+.bm[aria-disabled=true] { opacity: .5; }
+kbd { font: 600 13px ui-monospace, monospace; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; }
+ul { margin: 6px 0 0; padding-left: 18px; }
+li { margin: 4px 0; }
+.note { background: var(--accent-soft); border-radius: 12px; padding: 14px 16px; font-size: 14px; margin-top: 20px; }
+.btn { display: inline-block; background: var(--accent); color: #fff; text-decoration: none; font-weight: 600; padding: 10px 16px; border-radius: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p><a href="./">← Back to the site</a></p>
+  <h1>Save prices</h1>
+  <p class="sub">For Beehive, The Forest and Bloc, whose menus can't be read automatically. About a minute per store, and doing it weekly keeps prices fresh.</p>
+
+  <div class="step"><span class="n">1</span><div>
+    <h2>Add the bookmark (one time only)</h2>
+    <p>Drag this button onto your browser's bookmarks bar. If you don't see the bar, press <kbd>⌘</kbd> <kbd>Shift</kbd> <kbd>B</kbd> (Mac) or <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>B</kbd> (Windows).</p>
+    <a class="bm" id="bm" href="#" aria-disabled="true" onclick="alert('Drag this onto your bookmarks bar instead of clicking it.'); return false;">⬇ Save prices</a>
+    <p>Works in Chrome, Edge, Safari and Firefox on a computer.</p>
+  </div></div>
+
+  <div class="step"><span class="n">2</span><div>
+    <h2>Open a pharmacy's menu</h2>
+    <p>Wait until you can see products, then click <b>Save prices</b> on your bookmarks bar. A file like <code>beehive-slc.csv</code> downloads in a few seconds.</p>
+    <ul>
+      <li><a href="https://shop.beehivefarmacy.com/stores/beehives-farmacy" target="_blank" rel="noopener">Beehive Farmacy (Salt Lake City)</a></li>
+      <li><a href="https://dutchie.com/stores/the-forest-murray" target="_blank" rel="noopener">The Forest (Murray)</a></li>
+      <li><a href="https://dutchie.com/embedded-menu/6035916f516b4e34776f4dc5" target="_blank" rel="noopener">Bloc Pharmacy (South Jordan)</a></li>
+    </ul>
+  </div></div>
+
+  <div class="step"><span class="n">3</span><div>
+    <h2>Upload the files</h2>
+    <p>Open the upload page, drag in the downloaded <code>.csv</code> files, and click <b>Commit changes</b>. The site updates in about 3 minutes.</p>
+    <a class="btn" href="https://github.com/CANN3DC0RN/slc-pharmacy-prices/upload/main/partners" target="_blank" rel="noopener">Open the upload page</a>
+  </div></div>
+
+  <div class="note">
+    <b>How freshness works:</b> each store shows "prices checked X days ago" on the site. Prices more than 14 days old are hidden automatically, so the site never shows old prices as current.
+  </div>
+</div>
+<script>
+// Build the bookmark from export.js so there's only one copy of the code.
+fetch("export.js", { cache: "no-cache" }).then((r) => r.text()).then((code) => {
+  const bm = document.getElementById("bm");
+  bm.href = "javascript:" + encodeURIComponent(code);
+  bm.removeAttribute("aria-disabled");
+});
+</script>
+</body>
+</html>

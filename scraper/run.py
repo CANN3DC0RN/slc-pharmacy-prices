@@ -41,7 +41,11 @@ def main():
             items = SOURCES[store["source"]](store)
             if not items and store["source"] != "partner":
                 raise RuntimeError("no products found")
-            info.update(updated=now if items else None, ok=True, count=len(items))
+            updated = now if items else None
+            if store["source"] == "partner" and items:
+                # Hand-saved prices are only as fresh as the day they were saved.
+                updated = partner.collected_on(store) or now
+            info.update(updated=updated, ok=True, count=len(items))
             print(f"{store['name']}: {len(items)} products")
         except Exception:
             failures += 1
