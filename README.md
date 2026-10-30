@@ -13,7 +13,9 @@ Every 4 hours, a free GitHub job collects the latest prices, rebuilds every page
 - **Weekly price reports** (`/reports/`): published automatically every Monday. They cover the cheapest eighths, ounces, vapes and concentrates, how the pharmacies compare, the biggest sales, and, from the second week on, what changed since last week.
 - **Price guides** (`/prices/flower.html`, vapes, concentrates, edibles, tinctures, topicals): the cheapest options by size, prices by pharmacy, best value per gram, current sales, and a short Q&A. Rebuilt every run.
 - **Pharmacy pages** (`/pharmacy/<id>.html`): each pharmacy's prices compared with the Salt Lake typical price in every category, plus its sales and directions.
-- **News** (`/news/`): Utah medical cannabis headlines from KSL, The Salt Lake Tribune, Deseret News, FOX 13, ABC4, KUER, Utah Public Radio and KPCW, checked every 4 hours. Only the headline, source and date are shown, linking to the newsroom.
+- **News** (`/news/`): Utah medical cannabis headlines from KSL, The Salt Lake Tribune, Deseret News, FOX 13, ABC4, KUER, Utah Public Radio, KPCW and the Utah Department of Agriculture and Food, checked every 4 hours. Only the headline, source and date are shown, linking to the newsroom.
+
+- **Events** (`/events/`): festivals, medical card clinics, pharmacy events and the state Medical Cannabis Policy Advisory Board's public meetings. The next few also show on the home page.
 
 Weekly reports and price guides cover the Salt Lake area. Pharmacy pages and the comparison cover all of Utah.
 - **Sitemap and search tags** so Google and AI search tools can find and understand every page.
@@ -49,6 +51,24 @@ About once a week, which takes about 10 minutes for all six bookmark pharmacies 
 
 Each of these pharmacies shows "prices checked X days ago" on the site. Prices more than 14 days old are hidden automatically, so the site never shows old prices as current.
 
+## Adding an event
+
+Open `events/events.csv` on GitHub, click the pencil to edit, add a line, and click **Commit changes**. The site updates in a few minutes.
+
+| Column | Example |
+|---|---|
+| `title` | Free Med Card Day at WholesomeCo |
+| `start` | 2026-12-05 (year-month-day) |
+| `end` | 2026-12-06, or leave blank for one day |
+| `time` | 10:00 AM – 4:00 PM, or blank |
+| `location` | WholesomeCo, 580 W 100 N |
+| `city` | West Bountiful |
+| `url` | Link to the event or organizer |
+| `type` | Festival, Card clinic, Pharmacy event, Class, Public meeting |
+| `details` | One or two sentences |
+
+If a value has a comma in it, put the whole value in "double quotes". Board meetings are added automatically from the state's public notice site, and cannabis events on TownLift's community calendar are picked up too. Events drop to "Recent" after they happen and disappear after four months.
+
 ## Store-wide promos
 
 For promos like "20% off flower Tuesdays", add a row to `partners/deals.csv` (columns: `store`, `title`, `details`, `expires` as YYYY-MM-DD). They appear on that pharmacy's card on the home page and drop off after they expire.
@@ -82,6 +102,8 @@ Open the **Actions** tab. Each "Update prices" run should have a green ✓. A re
 | `scraper/run.py` | Collects prices from every store into `site/data.json` |
 | `scraper/build.py` | Builds reports, guides, pharmacy pages, the news page, history snapshots and the sitemap |
 | `scraper/news.py` | Collects Utah cannabis headlines into `site/news/news.json` |
+| `scraper/events.py` | Combines `events/events.csv`, board meetings and TownLift events into `site/events/events.json` |
+| `events/events.csv` | Events you add by hand |
 | `scraper/sources/` | One reader per price source |
 | `partners/` | Hand-saved price files and store-wide promos |
 | `history/` | One small price snapshot per day, for trends |
