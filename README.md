@@ -1,56 +1,75 @@
 # SLC Pharmacy Prices
 
-Compares medical cannabis prices and deals across Salt Lake area pharmacies.
-Every 4 hours, a free GitHub job collects the latest prices and republishes the site. Nothing needs to stay running on your computer.
+Compares medical cannabis prices and deals across Salt Lake area pharmacies, so Utah cardholders can see where to shop before they go.
 
-## How prices get in
+**Live site:** https://cann3dc0rn.github.io/slc-pharmacy-prices/
 
-| Pharmacy | How |
+Every 4 hours, a free GitHub job collects the latest prices, rebuilds every page and republishes the site. Nothing needs to stay running on your computer.
+
+## What's on the site
+
+- **Home page:** search, category tiles, today's best deals, and a full price comparison with filters (category, size, pharmacy, on sale) and sorting (price either way, price per gram, biggest discount, THC either way).
+- **Weekly price reports** (`/reports/`): published automatically every Monday. They cover the cheapest eighths, ounces, vapes and concentrates, how the pharmacies compare, the biggest sales, and, from the second week on, what changed since last week.
+- **Price guides** (`/prices/flower.html`, vapes, concentrates, edibles, tinctures, topicals): the cheapest options by size, prices by pharmacy, best value per gram, current sales, and a short Q&A. Rebuilt every run.
+- **Pharmacy pages** (`/pharmacy/<id>.html`): each pharmacy's prices compared with the Salt Lake typical price in every category, plus its sales and directions.
+- **Sitemap and search tags** so Google and AI search tools can find and understand every page.
+
+## Where prices come from
+
+| Pharmacy | How | How fresh |
+|---|---|---|
+| Dragonfly Wellness (Salt Lake City) | Automatic, from their public product page | Every 4 hours |
+| WholesomeCo (West Bountiful) | Automatic, from their public shop pages | Every 4 hours |
+| Beehive Farmacy (Salt Lake City) | Saved by hand with the "Save prices" bookmark | When you save it |
+| The Forest (Murray) | Saved by hand with the "Save prices" bookmark | When you save it |
+| Bloc Pharmacy (South Jordan) | Saved by hand with the "Save prices" bookmark | When you save it |
+
+Beehive, The Forest and Bloc use Dutchie menus, which block automatic reading, so their prices are saved by hand.
+
+If an automatic store's website changes and reading it fails, the site keeps showing that store's last good prices and labels them with their age.
+
+## Your weekly routine: the "Save prices" bookmark
+
+About once a week, which takes a few minutes:
+
+1. Open https://cann3dc0rn.github.io/slc-pharmacy-prices/save-prices.html (this page is hidden from search engines).
+2. The first time only, drag the **Save prices** button onto your bookmarks bar.
+3. Open each pharmacy's menu from the links on that page, wait for products to appear, and click **Save prices**. A file like `beehive-slc.csv` downloads.
+4. Click **Open the upload page**, drag in the downloaded files, and click **Commit changes**. The site updates in about 3 minutes.
+
+Each of these pharmacies shows "prices checked X days ago" on the site. Prices more than 14 days old are hidden automatically, so the site never shows old prices as current.
+
+## Store-wide promos
+
+For promos like "20% off flower Tuesdays", add a row to `partners/deals.csv` (columns: `store`, `title`, `details`, `expires` as YYYY-MM-DD). They appear on that pharmacy's card on the home page and drop off after they expire.
+
+A pharmacy can also send its own price list: copy `partners/TEMPLATE.csv` to `partners/<store-id>.csv` (ids are in `stores.json`).
+
+## When you buy a domain
+
+1. Change `site_url` in `config.json` to the new address, for example `https://slcpharmacyprices.com`. All links, the sitemap and the search tags follow it.
+2. In the repository, go to **Settings → Pages → Custom domain**, enter the domain, and follow GitHub's instructions for your domain registrar. Hosting on GitHub Pages stays free; you can also move to another host later, since the whole site is the `site/` folder.
+3. Submit `https://<your domain>/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
+
+To show the "Get listed free" button for pharmacies, set `CONTACT_EMAIL` near the top of the script in `site/index.html` to a dedicated email address.
+
+## Checking that it's working
+
+Open the **Actions** tab. Each "Update prices" run should have a green ✓. A red ✗ means every automatic store failed; the site keeps the last good prices until the next successful run. **Run workflow** on that page forces an update right away.
+
+## What's in this repository
+
+| Path | What it is |
 |---|---|
-| Dragonfly Wellness (SLC) | Automatic, read from their public product page |
-| WholesomeCo (West Bountiful) | Automatic, read from their public shop pages |
-| Beehive Farmacy (SLC), The Forest (Murray), Bloc (South Jordan) | Partner: the pharmacy sends a spreadsheet, see below |
-
-If an automatic store's website changes and the read fails, the site keeps showing that store's last good prices and labels them "last good …".
-
-## Saving prices by hand (the "Save prices" bookmark)
-
-Dutchie blocks automatic reading, so for Beehive, The Forest and Bloc you save their prices while you browse:
-open `save-prices.html` on the live site and follow the three steps (add bookmark → click it on the menu → upload the file).
-Hand-saved prices show "checked X days ago", and they're hidden once they're more than 14 days old.
-
-## Adding a partner pharmacy's prices
-
-1. Copy `partners/TEMPLATE.csv` to `partners/<store-id>.csv` (ids are in `stores.json`, e.g. `beehive-slc.csv`).
-2. Fill in one row per product. `sale_price`, `deal`, `thc`, `url` and `expires` (YYYY-MM-DD) are optional.
-3. For store-wide promos like "20% off flower Tuesdays", add a row to `partners/deals.csv`.
-
-Edit the file on github.com and save it. The site rebuilds within a few minutes.
-
-## Going live for free (GitHub Pages)
-
-1. Create a free account at github.com.
-2. Create a new **public** repository and upload everything in this folder, including the hidden `.github` folder.
-3. In the repository, open **Settings → Pages** and set **Source** to **GitHub Actions**.
-4. Open **Actions → Update prices → Run workflow**.
-5. When it finishes, the site is at `https://<your-username>.github.io/<repo-name>/`.
-
-After that it updates itself every 4 hours. Check **Actions** for the run history: a red ✗ means every automatic store failed.
-
-Later, to use your own domain, go to **Settings → Pages → Custom domain**. Hosting stays free.
-
-## Reports, guides and search pages
-
-After each price update, `scraper/build.py` builds pages from the data:
-
-- **Weekly price report** (`site/reports/`): written once a week (the first run each Monday, Utah time) and then left alone, like a dated article. From the second week on it includes what changed since last week.
-- **Price guides** (`site/prices/flower.html` etc.) and **pharmacy pages** (`site/pharmacy/<id>.html`): rebuilt on every run.
-- **Price history** (`history/`): one small snapshot per day, used for week-over-week changes.
-- **sitemap.xml** and **robots.txt** for search engines.
-
-### When you buy a domain
-
-Change `site_url` in `config.json` to the new address (for example `https://slcpharmacyprices.com`). Links, the sitemap and search-engine tags all follow it. Then submit `<your domain>/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
+| `stores.json` | The pharmacies on the site |
+| `config.json` | Site name and address |
+| `scraper/run.py` | Collects prices from every store into `site/data.json` |
+| `scraper/build.py` | Builds reports, guides, pharmacy pages, history snapshots and the sitemap |
+| `scraper/sources/` | One reader per price source |
+| `partners/` | Hand-saved price files and store-wide promos |
+| `history/` | One small price snapshot per day, for trends |
+| `site/` | The website itself (`index.html`, `style.css`, `save-prices.html`, generated pages) |
+| `.github/workflows/update-prices.yml` | The 4-hour schedule |
 
 ## Running it on your computer
 
@@ -64,4 +83,4 @@ Then open http://localhost:8787.
 
 ## Adding another pharmacy later
 
-Add it to `stores.json`. Use `"source": "partner"` unless someone writes a reader for that store in `scraper/sources/`.
+Add it to `stores.json`. If it uses a Dutchie menu, use `"source": "partner"` and add its Dutchie ID to the `STORES` list in `site/export.js` so the bookmark names the file correctly. Otherwise, a reader for its website can be added in `scraper/sources/`.
