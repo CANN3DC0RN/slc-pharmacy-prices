@@ -8,7 +8,7 @@ Every 4 hours, a free GitHub job collects the latest prices, rebuilds every page
 
 ## What's on the site
 
-- **Home page:** search, category tiles, today's best deals, the latest news, and a full price comparison with filters (area, category, size, pharmacy, on sale, saved) and sorting (price either way, price per gram, biggest discount, THC either way). Visitors start on the Salt Lake area, and the site remembers the area they pick.
+- **Home page:** search, category tiles, today's best deals, the latest news, and a full price comparison with filters (area, category, size, strain type, THC range, max price, brand, pharmacy, on sale, saved) and sorting (price either way, price per gram, biggest discount, THC either way). Visitors start on the Salt Lake area, and the site remembers the area they pick.
 - **Saved items:** the heart on any product saves it in that visitor's browser. Saved items show "↓ $5 since you saved it" when the price drops. Nothing is sent anywhere.
 - **Weekly price reports** (`/reports/`): published automatically every Monday. They cover the cheapest eighths, ounces, vapes and concentrates, how the pharmacies compare, the biggest sales, and, from the second week on, what changed since last week.
 - **Price guides** (`/prices/flower.html`, vapes, concentrates, edibles, tinctures, topicals): the cheapest options by size, prices by pharmacy, best value per gram, current sales, and a short Q&A. Rebuilt every run.

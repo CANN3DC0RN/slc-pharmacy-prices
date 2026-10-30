@@ -71,6 +71,14 @@
           <div class="fgroup"><h3>Area</h3><div id="fArea"></div></div>
           <div class="fgroup"><h3>Category</h3><div id="fCat"></div></div>
           <div class="fgroup" id="fSizeWrap"><h3>Size</h3><div class="pills" id="fSize"></div></div>
+          <div class="fgroup"><h3>Strain type</h3><div class="pills" id="fStrain"></div></div>
+          <div class="fgroup"><h3>THC %</h3>
+            <div class="range"><label><span class="sr">Minimum THC %</span><input type="number" id="fThcMin" min="0" max="100" step="1" placeholder="Min" inputmode="decimal"></label>
+              <span aria-hidden="true">to</span>
+              <label><span class="sr">Maximum THC %</span><input type="number" id="fThcMax" min="0" max="100" step="1" placeholder="Max" inputmode="decimal"></label></div></div>
+          <div class="fgroup"><h3>Price</h3>
+            <div class="range"><label><span class="sr">Maximum price</span><span class="pre">Up to $</span><input type="number" id="fPriceMax" min="0" step="1" placeholder="Any" inputmode="decimal"></label></div></div>
+          <div class="fgroup"><h3>Brand</h3><label class="sr" for="fBrand">Brand</label><select id="fBrand" class="fselect"></select></div>
           <div class="fgroup"><h3>Pharmacy</h3><div id="fStore"></div></div>
           <div class="fgroup"><label class="toggle">On sale only <input type="checkbox" id="fSale"></label>
             <label class="toggle" style="margin-top:10px">Saved only <input type="checkbox" id="fSaved"></label></div>
@@ -198,7 +206,20 @@ const ICONS = {
 const icon = (cat, size = 22) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[cat] || ICONS.Accessories}</svg>`;
 
 // Start on Flower: across all categories, $1 accessories crowd the top of a price sort.
-const state = { q: "", cat: "Flower", area: "Salt Lake area", stores: new Set(), sale: false, saved: false, sort: "price", size: null, shown: PAGE };
+const state = { q: "", cat: "Flower", area: "Salt Lake area", stores: new Set(), sale: false, saved: false, sort: "price", size: null,
+  strains: new Set(), brand: "", thcMin: null, thcMax: null, priceMax: null, shown: PAGE };
+
+// Pharmacies label strains a dozen ways; group them into the four people shop by.
+const STRAINS = ["Indica", "Sativa", "Hybrid", "CBD & ratios"];
+function strainOf(p) {
+  const t = (p.strain_type || "").toLowerCase();
+  if (!t) return "";
+  if (/cbd|\d\s*to\s*\d|ratio/.test(t)) return "CBD & ratios";
+  if (t.includes("hybrid")) return "Hybrid";
+  if (t.includes("indica")) return "Indica";
+  if (t.includes("sativa")) return "Sativa";
+  return "";
+}
 // Remember the visitor's area so St. George shoppers don't have to switch every visit.
 try { state.area = localStorage.getItem("area") ?? state.area; } catch {}
 
@@ -312,6 +333,11 @@ function inScope(p, skip) {
     (!state.sale || p.on_sale) &&
     (!state.saved || pkey(p) in saved) &&
     (skip === "size" || state.size == null || p.grams === state.size) &&
+    (skip === "strain" || !state.strains.size || state.strains.has(strainOf(p))) &&
+    (skip === "brand" || !state.brand || p.brand === state.brand) &&
+    (state.thcMin == null || (p.thc != null && p.thc >= state.thcMin)) &&
+    (state.thcMax == null || (p.thc != null && p.thc <= state.thcMax)) &&
+    (state.priceMax == null || p.price <= state.priceMax) &&
     state.q.toLowerCase().split(/\s+/).filter(Boolean).every((w) => (p.name + " " + p.brand).toLowerCase().includes(w));
 }
 
@@ -327,7 +353,16 @@ function renderFilters() {
     .map(([v, label, n]) => `<label class="opt"><input type="radio" name="area" value="${esc(v)}" ${state.area === v ? "checked" : ""}> ${esc(label)}<span class="n">${n}</span></label>`).join("");
   const sc = count("store", (p) => p.store);
   $("fStore").innerHTML = data.stores.filter((s) => s.count && (!state.area || s.area === state.area)).map((s) =>
-    `<label class="opt"><input type="checkbox" value="${esc(s.id)}" ${state.stores.has(s.id) ? "checked" : ""}> ${esc(s.name)} <span class="city">${esc(s.city)}</span><span class="n">${sc[s.id] || 0}</span></label>`).join("");
+    `<label class="opt"><input type="checkbox" value="${esc(s.id)}" ${state.stores.has(s.id) ? "checked" : ""}>
+      <span class="who">${esc(s.name)}<small>${esc(s.city)}</small></span><span class="n">${sc[s.id] || 0}</span></label>`).join("");
+  const stc = count("strain", strainOf);
+  $("fStrain").innerHTML = STRAINS.filter((t) => stc[t] || state.strains.has(t)).map((t) =>
+    `<button class="pill" type="button" data-strain="${t}" aria-pressed="${state.strains.has(t)}">${t} <span class="pn">${stc[t] || 0}</span></button>`).join("");
+  const bc = count("brand", (p) => p.brand);
+  const brands = Object.keys(bc).filter(Boolean).sort((a, b) => a.localeCompare(b));
+  if (state.brand && !brands.includes(state.brand)) brands.unshift(state.brand);
+  $("fBrand").innerHTML = `<option value="">All brands (${brands.length})</option>` +
+    brands.map((b) => `<option value="${esc(b)}" ${b === state.brand ? "selected" : ""}>${esc(b)} (${bc[b] || 0})</option>`).join("");
   const sizes = SIZES[state.cat] || [];
   $("fSizeWrap").hidden = !sizes.length;
   $("fSize").innerHTML = ["", ...sizes].map((g) =>
@@ -398,6 +433,17 @@ document.addEventListener("click", (e) => {
   if (state.saved) renderList();
 });
 $("fCat").addEventListener("change", (e) => update({ cat: e.target.value }));
+$("fStrain").addEventListener("click", (e) => {
+  const t = e.target.closest("[data-strain]")?.dataset.strain;
+  if (!t) return;
+  state.strains.has(t) ? state.strains.delete(t) : state.strains.add(t);
+  update();
+});
+$("fBrand").addEventListener("change", (e) => update({ brand: e.target.value }));
+const num = (el) => (el.value === "" || isNaN(el.valueAsNumber) ? null : el.valueAsNumber);
+$("fThcMin").addEventListener("input", (e) => update({ thcMin: num(e.target) }));
+$("fThcMax").addEventListener("input", (e) => update({ thcMax: num(e.target) }));
+$("fPriceMax").addEventListener("input", (e) => update({ priceMax: num(e.target) }));
 $("fArea").addEventListener("change", (e) => {
   try { localStorage.setItem("area", e.target.value); } catch {}
   state.stores.clear();
@@ -411,7 +457,12 @@ $("fSize").addEventListener("click", (e) => {
   const v = e.target.closest("[data-size]")?.dataset.size;
   if (v !== undefined) update({ size: v === "" ? null : Number(v) });
 });
-$("clear").addEventListener("click", () => { state.stores.clear(); update({ q: "", cat: "", sale: false, saved: false, size: null }); });
+$("clear").addEventListener("click", () => {
+  state.stores.clear();
+  state.strains.clear();
+  ["fThcMin", "fThcMax", "fPriceMax"].forEach((id) => ($(id).value = ""));
+  update({ q: "", cat: "", sale: false, saved: false, size: null, brand: "", thcMin: null, thcMax: null, priceMax: null });
+});
 $("cats").addEventListener("click", (e) => {
   const c = e.target.closest("[data-cat]")?.dataset.cat;
   if (c) { update({ cat: c }); goCompare(); }
