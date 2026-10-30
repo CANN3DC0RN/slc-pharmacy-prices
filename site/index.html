@@ -27,6 +27,7 @@
       <a href="#deals">Deals</a>
       <a href="#pharmacies">Pharmacies</a>
       <a href="reports/">Price reports</a>
+      <a href="news/">News</a>
       <a href="#for-pharmacies">For pharmacies</a>
       <a class="primary" href="#compare">Compare prices</a>
     </nav>
@@ -70,7 +71,8 @@
           <div class="fgroup"><h3>Category</h3><div id="fCat"></div></div>
           <div class="fgroup" id="fSizeWrap"><h3>Size</h3><div class="pills" id="fSize"></div></div>
           <div class="fgroup"><h3>Pharmacy</h3><div id="fStore"></div></div>
-          <div class="fgroup"><label class="toggle">On sale only <input type="checkbox" id="fSale"></label></div>
+          <div class="fgroup"><label class="toggle">On sale only <input type="checkbox" id="fSale"></label>
+            <label class="toggle" style="margin-top:10px">Saved only <input type="checkbox" id="fSaved"></label></div>
           <button class="clear" id="clear" type="button">Clear all filters</button>
         </details>
         <div>
@@ -90,6 +92,7 @@
               <option value="thc-asc">THC: low to high</option>
             </select>
           </div>
+          <div class="savedbar" id="savedBar" hidden></div>
           <div class="count" id="count" aria-live="polite"></div>
           <div class="grid" id="list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
           <button class="more" id="more" type="button" hidden>Show more</button>
@@ -115,6 +118,14 @@
         <a href="prices/tinctures.html">Cheapest tinctures</a>
         <a href="prices/topicals.html">Cheapest topicals</a>
       </div>
+    </section>
+
+    <section id="news" aria-labelledby="newsH">
+      <div class="head">
+        <div><h2 id="newsH">Utah cannabis news</h2><p>The latest headlines from local newsrooms.</p></div>
+        <a class="link" href="news/">All news →</a>
+      </div>
+      <ul class="newslist" id="newsList"></ul>
     </section>
 
     <section id="pharmacies" aria-labelledby="phH">
@@ -154,6 +165,7 @@
     <div class="flinks">
       <h4>More</h4>
       <a href="reports/">Weekly price reports</a>
+      <a href="news/">Utah cannabis news</a>
       <a href="#compare">Compare prices</a>
       <a href="#deals">Today's deals</a>
     </div>
@@ -167,6 +179,8 @@
 <script>
 // Set this to your contact email to show the "Get listed free" button.
 const CONTACT_EMAIL = "";
+// Set this to your GoatCounter code (the "slcprices" in slcprices.goatcounter.com) to count visits.
+const GOATCOUNTER = "";
 
 const PAGE = 48;
 const ORDER = ["Flower", "Vapes", "Concentrates", "Edibles", "Tinctures", "Topicals", "Accessories"];
@@ -183,7 +197,14 @@ const ICONS = {
 const icon = (cat, size = 22) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[cat] || ICONS.Accessories}</svg>`;
 
 // Start on Flower: across all categories, $1 accessories crowd the top of a price sort.
-const state = { q: "", cat: "Flower", stores: new Set(), sale: false, sort: "price", size: null, shown: PAGE };
+const state = { q: "", cat: "Flower", stores: new Set(), sale: false, saved: false, sort: "price", size: null, shown: PAGE };
+
+// Saved items live in this browser only: { "store|name|size": price when saved }.
+const pkey = (p) => [p.store, p.name, p.size].join("|");
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem("saved") || "{}"); } catch {}
+function persist() { try { localStorage.setItem("saved", JSON.stringify(saved)); } catch {} }
+const dropOf = (p) => (pkey(p) in saved ? Math.round((saved[pkey(p)] - p.price) * 100) / 100 : 0);
 // Links from the guide and pharmacy pages open the comparison pre-filtered (?cat=Vapes&store=wholesomeco).
 const params = new URLSearchParams(location.search);
 if (params.has("cat")) state.cat = params.get("cat");
@@ -218,17 +239,22 @@ function card(p) {
   const img = p.image
     ? `<img src="${esc(p.image)}" alt="" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',innerHTML:this.dataset.ph}))" data-ph='${icon(p.category, 44)}'>`
     : `<span class="ph">${icon(p.category, 44)}</span>`;
-  return `<a class="card" href="${esc(p.url || s.website)}" target="_blank" rel="noopener">
-    <div class="thumb">${img}${off ? `<span class="tag">${off}% off</span>` : ""}</div>
+  const k = pkey(p), isSaved = k in saved, drop = dropOf(p);
+  return `<article class="card">
+    <div class="thumb">${img}${off ? `<span class="tag">${off}% off</span>` : ""}
+      <button class="save" type="button" data-key="${esc(k)}" aria-pressed="${isSaved}" aria-label="${isSaved ? "Remove from saved" : "Save to watch the price"}" title="${isSaved ? "Saved" : "Save to watch the price"}">
+        <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+      </button></div>
     <div class="body">
       <span class="brand">${esc(p.brand || p.category)}</span>
-      <span class="name">${esc(p.name)}</span>
+      <a class="name" href="${esc(p.url || s.website)}" target="_blank" rel="noopener">${esc(p.name)}</a>
+      ${drop >= 0.01 ? `<span class="dropped">↓ ${money(drop)} since you saved it</span>` : ""}
       ${chips.length ? `<span class="chips">${chips.map((c) => `<span class="chip-s">${esc(c)}</span>`).join("")}</span>` : ""}
       <span class="price"><strong>${money(p.price)}</strong>${off ? `<s>${money(p.regular_price)}</s>` : ""}
         ${p.price_per_gram ? `<span class="ppg">${money(p.price_per_gram)}/g</span>` : ""}</span>
       <span class="store-line"><span class="dot"></span><span>${esc(s.name)} · ${esc(s.city)}</span></span>
     </div>
-  </a>`;
+  </article>`;
 }
 
 function renderStats() {
@@ -280,6 +306,7 @@ function inScope(p, skip) {
   return (skip === "cat" || !state.cat || p.category === state.cat) &&
     (skip === "store" || !state.stores.size || state.stores.has(p.store)) &&
     (!state.sale || p.on_sale) &&
+    (!state.saved || pkey(p) in saved) &&
     (skip === "size" || state.size == null || p.grams === state.size) &&
     state.q.toLowerCase().split(/\s+/).filter(Boolean).every((w) => (p.name + " " + p.brand).toLowerCase().includes(w));
 }
@@ -298,6 +325,7 @@ function renderFilters() {
   $("fSize").innerHTML = ["", ...sizes].map((g) =>
     `<button class="pill" type="button" data-size="${g}" aria-pressed="${String(state.size ?? "") === String(g)}">${g === "" ? "Any" : fmtG(g)}</button>`).join("");
   $("fSale").checked = state.sale;
+  $("fSaved").checked = state.saved;
   $("sort").value = state.sort;
   if ($("q").value !== state.q) $("q").value = state.q;
 }
@@ -325,6 +353,7 @@ function update(changes = {}) {
   if ("cat" in changes && !(SIZES[state.cat] || []).includes(state.size)) state.size = null;
   renderFilters();
   renderList();
+  renderSavedBar();
 }
 
 const goCompare = () => $("compare").scrollIntoView();
@@ -333,6 +362,33 @@ $("heroSearch").addEventListener("submit", (e) => { e.preventDefault(); update({
 $("q").addEventListener("input", (e) => update({ q: e.target.value }));
 $("sort").addEventListener("change", (e) => update({ sort: e.target.value }));
 $("fSale").addEventListener("change", (e) => update({ sale: e.target.checked }));
+$("fSaved").addEventListener("change", (e) => update(e.target.checked ? { saved: true, cat: "" } : { saved: false }));
+
+function renderSavedBar() {
+  const mine = data.products.filter((p) => pkey(p) in saved);
+  const dropped = mine.filter((p) => dropOf(p) >= 0.01).length;
+  $("savedBar").hidden = !mine.length || state.saved;
+  $("savedBar").innerHTML = `<span>♥ ${mine.length} saved${dropped ? ` · <b>${dropped} cheaper since you saved ${dropped === 1 ? "it" : "them"}</b>` : ""}</span>
+    <button type="button" class="link" id="showSaved">Show saved</button>`;
+}
+$("savedBar").addEventListener("click", (e) => { if (e.target.id === "showSaved") update({ saved: true, cat: "" }); });
+
+// Save buttons work in every card list (deals rail and comparison grid).
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".save");
+  if (!btn) return;
+  const k = btn.dataset.key;
+  if (k in saved) delete saved[k];
+  else saved[k] = data.products.find((p) => pkey(p) === k)?.price;
+  persist();
+  document.querySelectorAll(`.save[data-key="${CSS.escape(k)}"]`).forEach((b) => {
+    b.setAttribute("aria-pressed", k in saved);
+    b.setAttribute("aria-label", k in saved ? "Remove from saved" : "Save to watch the price");
+    b.title = k in saved ? "Saved" : "Save to watch the price";
+  });
+  renderSavedBar();
+  if (state.saved) renderList();
+});
 $("fCat").addEventListener("change", (e) => update({ cat: e.target.value }));
 $("fStore").addEventListener("change", (e) => {
   e.target.checked ? state.stores.add(e.target.value) : state.stores.delete(e.target.value);
@@ -342,7 +398,7 @@ $("fSize").addEventListener("click", (e) => {
   const v = e.target.closest("[data-size]")?.dataset.size;
   if (v !== undefined) update({ size: v === "" ? null : Number(v) });
 });
-$("clear").addEventListener("click", () => { state.stores.clear(); update({ q: "", cat: "", sale: false, size: null }); });
+$("clear").addEventListener("click", () => { state.stores.clear(); update({ q: "", cat: "", sale: false, saved: false, size: null }); });
 $("cats").addEventListener("click", (e) => {
   const c = e.target.closest("[data-cat]")?.dataset.cat;
   if (c) { update({ cat: c }); goCompare(); }
@@ -358,6 +414,11 @@ $("yr").textContent = new Date().getFullYear();
 if (CONTACT_EMAIL) {
   $("ctaBtn").href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent("List my pharmacy on SLC Pharmacy Prices");
   $("ctaBtn").hidden = false;
+}
+if (GOATCOUNTER) {
+  document.head.appendChild(Object.assign(document.createElement("script"), {
+    async: true, src: "https://gc.zgo.at/count.js", dataset: { goatcounter: `https://${GOATCOUNTER}.goatcounter.com/count` },
+  }));
 }
 // Open the filter panel on wide screens; it collapses on phones.
 const wide = matchMedia("(min-width: 900px)");
@@ -378,6 +439,13 @@ fetch("data.json", { cache: "no-cache" }).then((r) => r.json()).then((d) => {
 }).catch(() => {
   $("list").innerHTML = `<div class="empty">Couldn't load prices right now. Please refresh in a minute.</div>`;
 });
+
+fetch("news/news.json", { cache: "no-cache" }).then((r) => r.json()).then((list) => {
+  const date = (iso) => new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  $("newsList").innerHTML = list.slice(0, 5).map((a) => `<li><a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.title)}</a>
+    <span>${esc(a.source)} · ${date(a.published)}</span></li>`).join("");
+  if (!list.length) $("news").hidden = true;
+}).catch(() => ($("news").hidden = true));
 
 fetch("reports/index.json", { cache: "no-cache" }).then((r) => r.json()).then((list) => {
   const r = list[0];

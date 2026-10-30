@@ -230,3 +230,27 @@ footer .about { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.12)
 .faq summary { font-weight: 600; cursor: pointer; }
 .faq p { margin: 10px 0 0; color: var(--muted); }
 .rlist { display: grid; gap: 12px; }
+
+/* News */
+.newslist { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.newslist li { padding: 14px 18px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; }
+.newslist li:last-child { border-bottom: 0; }
+.newslist a { font-weight: 600; text-decoration: none; line-height: 1.35; }
+.newslist a:hover { color: var(--accent); }
+.newslist span { font-size: 13px; color: var(--muted); }
+
+/* Saved items */
+.card { position: relative; }
+.card .name { text-decoration: none; }
+.card .name::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.save { position: absolute; top: 8px; right: 8px; z-index: 2; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line);
+  background: rgba(255,255,255,.92); color: #6b766f; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.save svg { fill: none; }
+.save:hover { color: var(--sale); }
+.save[aria-pressed=true] { color: #e0457b; border-color: #f3b4c9; }
+.save[aria-pressed=true] svg { fill: currentColor; }
+.dropped { font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 2px 7px; align-self: flex-start; }
+.savedbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--accent-soft);
+  border-radius: var(--radius-sm); padding: 10px 14px; font-size: 14px; margin-bottom: 12px; }
+.savedbar .link { background: none; border: 0; cursor: pointer; padding: 0; }
+.savedbar[hidden] { display: none; }

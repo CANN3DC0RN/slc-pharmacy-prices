@@ -25,6 +25,7 @@ with open(os.path.join(ROOT, "config.json")) as f:
     CONFIG = json.load(f)
 SITE_URL = CONFIG["site_url"].rstrip("/")
 SITE_NAME = CONFIG["site_name"]
+GOATCOUNTER = CONFIG.get("goatcounter", "")
 
 GUIDES = ["Flower", "Vapes", "Concentrates", "Edibles", "Tinctures", "Topicals"]
 SIZES = {"Flower": [1, 3.5, 7, 14, 28], "Vapes": [0.5, 1, 2], "Concentrates": [0.5, 1]}
@@ -91,6 +92,8 @@ def page(rel, title, description, body, json_ld=None):
     """Wrap body in the site's nav and footer. Every generated page sits one folder deep."""
     up = "../"
     ld = f'<script type="application/ld+json">{json.dumps(json_ld)}</script>\n' if json_ld else ""
+    if GOATCOUNTER:
+        ld += f'<script data-goatcounter="https://{GOATCOUNTER}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>\n'
     guides = "".join(f'<a href="{up}prices/{slug(c)}.html">Cheapest {c.lower()}</a>' for c in GUIDES)
     stores = "".join(f'<a href="{up}pharmacy/{esc(s["id"])}.html">{esc(s["name"])}</a>' for s in STORES)
     return f"""<!doctype html>
@@ -121,6 +124,7 @@ def page(rel, title, description, body, json_ld=None):
       <a href="{up}#deals">Deals</a>
       <a href="{up}#pharmacies">Pharmacies</a>
       <a href="{up}reports/">Price reports</a>
+      <a href="{up}news/">News</a>
       <a class="primary" href="{up}#compare">Compare prices</a>
     </nav>
   </div>
@@ -136,7 +140,7 @@ def page(rel, title, description, body, json_ld=None):
     </div>
     <div class="flinks"><h4>Price guides</h4>{guides}</div>
     <div class="flinks"><h4>Pharmacies</h4>{stores}</div>
-    <div class="flinks"><h4>More</h4><a href="{up}reports/">Weekly price reports</a><a href="{up}#compare">Compare prices</a><a href="{up}#deals">Today's deals</a></div>
+    <div class="flinks"><h4>More</h4><a href="{up}reports/">Weekly price reports</a><a href="{up}news/">Utah cannabis news</a><a href="{up}#compare">Compare prices</a><a href="{up}#deals">Today's deals</a></div>
     <div class="about">
       <p>Prices come from each pharmacy's online menu. Prices and availability can change, so always confirm with the pharmacy before you go.</p>
       <p>For Utah medical cannabis cardholders. We don't sell anything and aren't affiliated with any pharmacy listed. Nothing here is medical advice.</p>
@@ -548,11 +552,38 @@ def build_pharmacy(s):
     write(rel, page(rel, f"{s['name']} Prices & Deals ({s['city']}, UT) · {SITE_NAME}", desc, body))
 
 
+# ---------- news ----------
+
+def news_item(a):
+    when = datetime.datetime.fromisoformat(a["published"]).astimezone(TZ).date()
+    return (f'<li><a href="{esc(a["url"])}" target="_blank" rel="noopener">{esc(a["title"])}</a>'
+            f'<span>{esc(a["source"])} · {esc(long_date(when))}</span></li>')
+
+
+def build_news():
+    path = os.path.join(SITE, "news", "news.json")
+    stories = []
+    if os.path.exists(path):
+        with open(path) as f:
+            stories = json.load(f)
+    inner = (f'<ul class="newslist">{"".join(news_item(a) for a in stories)}</ul>' if stories
+             else '<p class="note">No stories yet. Check back soon.</p>')
+    body = hero([("Home", "../"), ("News", None)], "Utah medical cannabis news",
+                "Headlines about medical cannabis in Utah from local newsrooms, checked several times a day. "
+                "Each headline links to the full story at the newsroom.")
+    body += f'<div class="wrap"><section>{inner}</section></div>'
+    write("news/index.html", page("news/", f"Utah Medical Cannabis News · {SITE_NAME}",
+                                  "The latest Utah medical cannabis headlines from KSL, The Salt Lake Tribune, Deseret News, KUER and other local newsrooms.",
+                                  body))
+    return stories
+
+
 # ---------- sitemap ----------
 
-def build_sitemap(reports):
+def build_sitemap(reports, stories):
     today = NOW.date().isoformat()
-    urls = [("", today), ("reports/", reports[0]["published"] if reports else today)]
+    urls = [("", today), ("reports/", reports[0]["published"] if reports else today),
+            ("news/", stories[0]["published"][:10] if stories else today)]
     urls += [(f"prices/{slug(c)}.html", today) for c in GUIDES]
     urls += [(f"pharmacy/{s['id']}.html", today) for s in STORES]
     urls += [(f"reports/{r['slug']}.html", r["published"]) for r in reports]
@@ -577,7 +608,8 @@ def main():
         build_guide(cat)
     for s in STORES:
         build_pharmacy(s)
-    build_sitemap(reports)
+    stories = build_news()
+    build_sitemap(reports, stories)
     print(f"Built {len(GUIDES)} guides, {len(STORES)} pharmacy pages, {len(reports)} reports")
 
 
