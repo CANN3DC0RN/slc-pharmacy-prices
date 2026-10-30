@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SLC Pharmacy Prices · Compare Utah Medical Cannabis Prices</title>
-<meta name="description" content="Compare medical cannabis prices and deals across Salt Lake area pharmacies in one place. Updated automatically throughout the day.">
-<meta property="og:title" content="SLC Pharmacy Prices">
-<meta property="og:description" content="Compare medical cannabis prices and deals across Salt Lake area pharmacies, updated throughout the day.">
+<title>Utah Cannabis Prices · Compare Medical Cannabis Prices Across Utah</title>
+<meta name="description" content="Compare medical cannabis prices and deals across Utah pharmacies in one place. Updated automatically throughout the day.">
+<meta property="og:title" content="Utah Cannabis Prices">
+<meta property="og:description" content="Compare medical cannabis prices and deals across Utah pharmacies, updated throughout the day.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0f3d2a">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f3d2a'/%3E%3Cpath d='M16 25V14M16 14c-5 0-8-3.5-8-8.5 5 0 8 3 8 8.5zm0 0c5 0 8-3.5 8-8.5-5 0-8 3-8 8.5z' stroke='%237ee2a8' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
@@ -19,9 +19,9 @@
 
 <header class="nav">
   <div class="wrap">
-    <a class="logo" href="#top" aria-label="SLC Pharmacy Prices home">
+    <a class="logo" href="#top" aria-label="Utah Cannabis Prices home">
       <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#17603f"/><path d="M16 25V14M16 14c-5 0-8-3.5-8-8.5 5 0 8 3 8 8.5zm0 0c5 0 8-3.5 8-8.5-5 0-8 3-8 8.5z" stroke="#7ee2a8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      SLC Pharmacy Prices
+      Utah Cannabis Prices
     </a>
     <nav aria-label="Main">
       <a href="#deals">Deals</a>
@@ -37,8 +37,8 @@
 <main id="top">
   <div class="hero">
     <div class="wrap">
-      <h1>Find the best medical cannabis prices in <em>Salt Lake</em>.</h1>
-      <p>Compare prices and deals across Salt Lake area pharmacies in one place, so you know where to shop before you go.</p>
+      <h1>Find the best medical cannabis prices in <em>Utah</em>.</h1>
+      <p>Compare prices and deals across Utah's medical cannabis pharmacies in one place, so you know where to shop before you go.</p>
       <form class="search" id="heroSearch" role="search">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <label class="sr" for="heroQ">Search products</label>
@@ -136,7 +136,7 @@
 
     <div class="cta" id="for-pharmacies">
       <div>
-        <h2>Run a Salt Lake pharmacy?</h2>
+        <h2>Run a Utah pharmacy?</h2>
         <p>Get your menu and specials in front of patients who are comparing prices right now. Listing is free. Send us your menu and we'll handle the rest.</p>
       </div>
       <a class="btn" id="ctaBtn" href="#" hidden>Get listed free</a>
@@ -149,9 +149,9 @@
     <div>
       <div class="logo">
         <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#17603f"/><path d="M16 25V14M16 14c-5 0-8-3.5-8-8.5 5 0 8 3 8 8.5zm0 0c5 0 8-3.5 8-8.5-5 0-8 3-8 8.5z" stroke="#7ee2a8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        SLC Pharmacy Prices
+        Utah Cannabis Prices
       </div>
-      <p>© <span id="yr"></span> SLC Pharmacy Prices</p>
+      <p>© <span id="yr"></span> Utah Cannabis Prices</p>
     </div>
     <div class="flinks">
       <h4>Price guides</h4>
@@ -180,7 +180,7 @@
 <script>
 // Set this to your contact email to show the "Get listed free" button.
 const CONTACT_EMAIL = "";
-// Set this to your GoatCounter code (the "slcprices" in slcprices.goatcounter.com) to count visits.
+// Set this to your GoatCounter code (the "utahcannabisprices" in utahcannabisprices.goatcounter.com) to count visits.
 const GOATCOUNTER = "";
 
 const PAGE = 48;
@@ -425,7 +425,7 @@ $("more").addEventListener("click", () => { state.shown += PAGE; renderList(); }
 
 $("yr").textContent = new Date().getFullYear();
 if (CONTACT_EMAIL) {
-  $("ctaBtn").href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent("List my pharmacy on SLC Pharmacy Prices");
+  $("ctaBtn").href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent("List my pharmacy on Utah Cannabis Prices");
   $("ctaBtn").hidden = false;
 }
 if (GOATCOUNTER) {

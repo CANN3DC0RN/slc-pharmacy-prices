@@ -1,4 +1,4 @@
-# SLC Pharmacy Prices
+# Utah Cannabis Prices
 
 Compares medical cannabis prices and deals across Utah pharmacies, starting with the Salt Lake area, so cardholders can see where to shop before they go.
 
@@ -57,13 +57,13 @@ A pharmacy can also send its own price list: copy `partners/TEMPLATE.csv` to `pa
 
 ## When you buy a domain
 
-1. Change `site_url` in `config.json` to the new address, for example `https://slcpharmacyprices.com`. All links, the sitemap and the search tags follow it.
+1. Change `site_url` in `config.json` to the new address, for example `https://utahcannabisprices.com`. All links, the sitemap and the search tags follow it.
 2. In the repository, go to **Settings → Pages → Custom domain**, enter the domain, and follow GitHub's instructions for your domain registrar. Hosting on GitHub Pages stays free; you can also move to another host later, since the whole site is the `site/` folder.
 3. Submit `https://<your domain>/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
 
 ## Counting visitors
 
-The site is ready for [GoatCounter](https://www.goatcounter.com), a free, privacy-friendly visit counter that uses no cookies (so no cookie banner). Sign up, pick a code (for example `slcprices`), then put that code in two places: `goatcounter` in `config.json` and `GOATCOUNTER` near the top of the script in `site/index.html`. Visits show up on your GoatCounter dashboard.
+The site is ready for [GoatCounter](https://www.goatcounter.com), a free, privacy-friendly visit counter that uses no cookies (so no cookie banner). Sign up, pick a code (for example `utahcannabisprices`), then put that code in two places: `goatcounter` in `config.json` and `GOATCOUNTER` near the top of the script in `site/index.html`. Visits show up on your GoatCounter dashboard.
 
 ## Contact button
 
