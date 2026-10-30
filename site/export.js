@@ -22,6 +22,17 @@
     const m = location.pathname.match(/\/embedded-menu\/([a-f0-9]{24})/);
     if (m) dispensaryId = m[1];
   }
+  if (!calls.length) {
+    // On a pharmacy's own website the Dutchie menu sits in a frame the bookmark can't read,
+    // so send them to the same menu on its own page.
+    const embed = [...performance.getEntriesByType("resource").map((e) => e.name), ...[...document.querySelectorAll("iframe")].map((f) => f.src)]
+      .map((u) => u.match(/embedded-menu\/([a-f0-9]{24})/)).find(Boolean);
+    if (embed) {
+      alert("Save prices: this menu is inside the pharmacy's website, where it can't be read. Opening the full menu now. When products show, click Save prices again.");
+      location.href = "https://dutchie.com/embedded-menu/" + embed[1];
+      return;
+    }
+  }
   if (!dispensaryId || !calls.length) {
     alert("Save prices: open the pharmacy's online menu (the page with products on it) first, then click this again.");
     return;

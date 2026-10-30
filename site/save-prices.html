@@ -40,7 +40,8 @@ li { margin: 4px 0; }
   <p class="sub">For the pharmacies whose menus can't be read automatically. About a minute per store, and doing it weekly keeps prices fresh.</p>
 
   <div class="step"><span class="n">1</span><div>
-    <h2>Add the bookmark (one time only)</h2>
+    <h2>Add the bookmark</h2>
+    <p><b>Added it before October 30?</b> Delete the old one and drag this one in its place. This version updates itself, so it's the last time you'll need to.</p>
     <p>Drag this button onto your browser's bookmarks bar. If you don't see the bar, press <kbd>⌘</kbd> <kbd>Shift</kbd> <kbd>B</kbd> (Mac) or <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>B</kbd> (Windows).</p>
     <a class="bm" id="bm" href="#" aria-disabled="true" onclick="alert('Drag this onto your bookmarks bar instead of clicking it.'); return false;">⬇ Save prices</a>
     <p>Works in Chrome, Edge, Safari and Firefox on a computer.</p>
@@ -48,7 +49,7 @@ li { margin: 4px 0; }
 
   <div class="step"><span class="n">2</span><div>
     <h2>Open a pharmacy's menu</h2>
-    <p>Wait until you can see products, then click <b>Save prices</b> on your bookmarks bar. A file like <code>beehive-slc.csv</code> downloads in a few seconds.</p>
+    <p>Use these links. Wait until you can see products, then click <b>Save prices</b> on your bookmarks bar. A file like <code>beehive-slc.csv</code> downloads in a few seconds. If you're on the pharmacy's own website instead, the bookmark switches you to the right page; click it again there.</p>
     <ul>
       <li><a href="https://shop.beehivefarmacy.com/stores/beehives-farmacy" target="_blank" rel="noopener">Beehive Farmacy (Salt Lake City)</a></li>
       <li><a href="https://dutchie.com/stores/the-forest-murray" target="_blank" rel="noopener">The Forest (Murray)</a></li>
@@ -70,12 +71,23 @@ li { margin: 4px 0; }
   </div>
 </div>
 <script>
-// Build the bookmark from export.js so there's only one copy of the code.
-fetch("export.js", { cache: "no-cache" }).then((r) => r.text()).then((code) => {
-  const bm = document.getElementById("bm");
-  bm.href = "javascript:" + encodeURIComponent(code);
-  bm.removeAttribute("aria-disabled");
-});
+// The bookmark is a small loader: each click fetches the latest export.js from this site,
+// so fixes and new pharmacies reach it without dragging it again. If a pharmacy's site
+// won't load outside scripts, the fallback still sends them to the readable menu page.
+const src = new URL("export.js", location.href).href;
+const loader = `(() => {
+  const s = document.createElement("script");
+  s.src = ${JSON.stringify(src)} + "?" + Date.now();
+  s.onerror = () => {
+    const m = document.documentElement.innerHTML.match(/embedded-menu\\/([a-f0-9]{24})/);
+    if (m) location.href = "https://dutchie.com/embedded-menu/" + m[1];
+    else alert("Save prices couldn't start on this page. Open the menu from the Save prices page and try again.");
+  };
+  document.body.appendChild(s);
+})();`;
+const bm = document.getElementById("bm");
+bm.href = "javascript:" + encodeURIComponent(loader);
+bm.removeAttribute("aria-disabled");
 </script>
 </body>
 </html>

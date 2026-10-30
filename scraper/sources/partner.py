@@ -23,12 +23,21 @@ def _expired(row):
     return bool(exp) and exp < _today()
 
 
-def _rows(store):
-    path = os.path.join(PARTNER_DIR, f"{store['id']}.csv")
-    if not os.path.exists(path):
-        return []
+def _read(path):
     with open(path, newline="", encoding="utf-8-sig") as f:
         return list(csv.DictReader(f))
+
+
+def _newest(rows):
+    return max(((r.get("collected") or "").strip() for r in rows), default="")
+
+
+def _rows(store):
+    """The store's price file. An older bookmark that didn't know the store names the
+    file dutchie-<menu id>.csv, so take whichever of the two was saved most recently."""
+    names = [f"{store['id']}.csv"] + ([f"dutchie-{store['dutchie_id']}.csv"] if store.get("dutchie_id") else [])
+    files = [_read(p) for p in (os.path.join(PARTNER_DIR, n) for n in names) if os.path.exists(p)]
+    return max(files, key=_newest, default=[])
 
 
 def collected_on(store):

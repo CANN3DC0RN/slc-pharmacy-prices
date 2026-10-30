@@ -24,7 +24,8 @@
     "address": "1991 S 3600 W, Salt Lake City, UT 84104",
     "website": "https://beehivefarmacy.com/",
     "source": "partner",
-    "area": "Salt Lake area"
+    "area": "Salt Lake area",
+    "dutchie_id": "5ea72292b6c1d3012f5eb694"
   },
   {
     "id": "the-forest-murray",
@@ -33,7 +34,8 @@
     "address": "6041 State St, Murray, UT 84107",
     "website": "https://theforestutah.com/",
     "source": "partner",
-    "area": "Salt Lake area"
+    "area": "Salt Lake area",
+    "dutchie_id": "69cd22a84028784c6f7ecf8a"
   },
   {
     "id": "bloc-south-jordan",
@@ -42,7 +44,8 @@
     "address": "10392 South Jordan Gateway, South Jordan, UT 84095",
     "website": "https://blocpharmacy.com/southjordan/",
     "source": "partner",
-    "area": "Salt Lake area"
+    "area": "Salt Lake area",
+    "dutchie_id": "6035916f516b4e34776f4dc5"
   },
   {
     "id": "curaleaf-lehi",
@@ -87,7 +90,8 @@
     "address": "870 W 1150 S, Suite C, Brigham City, UT 84302",
     "website": "https://shop.beehivefarmacy.com/stores/beehive-farmacy-brigham-city",
     "source": "partner",
-    "area": "Northern Utah"
+    "area": "Northern Utah",
+    "dutchie_id": "603fbfd8751ff0189db9b778"
   },
   {
     "id": "flower-shop-ogden",
@@ -124,7 +128,8 @@
     "address": "1624 S Convention Center Dr, St. George, UT 84790",
     "website": "https://blocpharmacy.com/stgeorge/",
     "source": "partner",
-    "area": "Southern Utah"
+    "area": "Southern Utah",
+    "dutchie_id": "60359153c590f500e234ba43"
   },
   {
     "id": "zion-cedar-city",
@@ -133,6 +138,7 @@
     "address": "301 S Main St, Cedar City, UT 84720",
     "website": "https://www.zionmed.com/",
     "source": "partner",
-    "area": "Southern Utah"
+    "area": "Southern Utah",
+    "dutchie_id": "60b0455896ed3f00b4e88396"
   }
 ]
