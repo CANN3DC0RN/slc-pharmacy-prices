@@ -68,6 +68,7 @@
       <div class="layout">
         <details class="filters" id="filters">
           <summary>Filters <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="fgroup"><h3>Area</h3><div id="fArea"></div></div>
           <div class="fgroup"><h3>Category</h3><div id="fCat"></div></div>
           <div class="fgroup" id="fSizeWrap"><h3>Size</h3><div class="pills" id="fSize"></div></div>
           <div class="fgroup"><h3>Pharmacy</h3><div id="fStore"></div></div>
@@ -129,7 +130,7 @@
     </section>
 
     <section id="pharmacies" aria-labelledby="phH">
-      <div class="head"><div><h2 id="phH">Pharmacies</h2><p>Salt Lake area pharmacies we track. More coming soon.</p></div></div>
+      <div class="head"><div><h2 id="phH">Pharmacies</h2><p>Utah medical cannabis pharmacies we track, starting with the Salt Lake area.</p></div></div>
       <div class="stores" id="stores"></div>
     </section>
 
@@ -197,7 +198,9 @@ const ICONS = {
 const icon = (cat, size = 22) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[cat] || ICONS.Accessories}</svg>`;
 
 // Start on Flower: across all categories, $1 accessories crowd the top of a price sort.
-const state = { q: "", cat: "Flower", stores: new Set(), sale: false, saved: false, sort: "price", size: null, shown: PAGE };
+const state = { q: "", cat: "Flower", area: "Salt Lake area", stores: new Set(), sale: false, saved: false, sort: "price", size: null, shown: PAGE };
+// Remember the visitor's area so St. George shoppers don't have to switch every visit.
+try { state.area = localStorage.getItem("area") ?? state.area; } catch {}
 
 // Saved items live in this browser only: { "store|name|size": price when saved }.
 const pkey = (p) => [p.store, p.name, p.size].join("|");
@@ -208,7 +211,7 @@ const dropOf = (p) => (pkey(p) in saved ? Math.round((saved[pkey(p)] - p.price) 
 // Links from the guide and pharmacy pages open the comparison pre-filtered (?cat=Vapes&store=wholesomeco).
 const params = new URLSearchParams(location.search);
 if (params.has("cat")) state.cat = params.get("cat");
-if (params.get("store")) state.stores.add(params.get("store"));
+if (params.get("store")) { state.stores.add(params.get("store")); state.area = ""; }
 let data, storesById = {};
 
 const $ = (id) => document.getElementById(id);
@@ -294,7 +297,7 @@ function renderStores() {
     else if (s.count) status = `<span class="status stale"><span class="dot"></span>Showing prices from ${ago(s.updated)}</span>`;
     else status = `<span class="status soon"><span class="dot"></span>Prices coming soon</span>`;
     const map = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(s.name + " " + s.address);
-    return `<div class="store"><h3><a href="pharmacy/${esc(s.id)}.html">${esc(s.name)}</a></h3><div class="addr">${esc(s.address)}</div>${status}
+    return `<div class="store"><span class="eyebrow">${esc(s.area || "")}</span><h3>${s.count ? `<a href="pharmacy/${esc(s.id)}.html">${esc(s.name)}</a>` : esc(s.name)} <span class="city">${esc(s.city)}</span></h3><div class="addr">${esc(s.address)}</div>${status}
       ${promos.map((d) => `<div class="promo"><b>${esc(d.title)}</b>${d.details ? "<br>" + esc(d.details) : ""}</div>`).join("")}
       <div class="links"><a class="link" href="${esc(s.website)}" target="_blank" rel="noopener">Website</a>
       <a class="link" href="${map}" target="_blank" rel="noopener">Directions</a>
@@ -303,7 +306,8 @@ function renderStores() {
 }
 
 function inScope(p, skip) {
-  return (skip === "cat" || !state.cat || p.category === state.cat) &&
+  return (skip === "area" || !state.area || storesById[p.store]?.area === state.area) &&
+    (skip === "cat" || !state.cat || p.category === state.cat) &&
     (skip === "store" || !state.stores.size || state.stores.has(p.store)) &&
     (!state.sale || p.on_sale) &&
     (!state.saved || pkey(p) in saved) &&
@@ -317,9 +321,13 @@ function renderFilters() {
   const total = Object.values(cc).reduce((a, b) => a + b, 0);
   $("fCat").innerHTML = [["", "All categories", total], ...ORDER.filter((c) => cc[c] || state.cat === c).map((c) => [c, c, cc[c] || 0])]
     .map(([v, label, n]) => `<label class="opt"><input type="radio" name="cat" value="${v}" ${state.cat === v ? "checked" : ""}> ${label}<span class="n">${n}</span></label>`).join("");
+  const ac = count("area", (p) => storesById[p.store]?.area);
+  const areas = [...new Set(data.stores.filter((s) => s.count).map((s) => s.area))];
+  $("fArea").innerHTML = [["", "All of Utah", Object.values(ac).reduce((a, b) => a + b, 0)], ...areas.map((a) => [a, a, ac[a] || 0])]
+    .map(([v, label, n]) => `<label class="opt"><input type="radio" name="area" value="${esc(v)}" ${state.area === v ? "checked" : ""}> ${esc(label)}<span class="n">${n}</span></label>`).join("");
   const sc = count("store", (p) => p.store);
-  $("fStore").innerHTML = data.stores.filter((s) => s.count).map((s) =>
-    `<label class="opt"><input type="checkbox" value="${esc(s.id)}" ${state.stores.has(s.id) ? "checked" : ""}> ${esc(s.name)}<span class="n">${sc[s.id] || 0}</span></label>`).join("");
+  $("fStore").innerHTML = data.stores.filter((s) => s.count && (!state.area || s.area === state.area)).map((s) =>
+    `<label class="opt"><input type="checkbox" value="${esc(s.id)}" ${state.stores.has(s.id) ? "checked" : ""}> ${esc(s.name)} <span class="city">${esc(s.city)}</span><span class="n">${sc[s.id] || 0}</span></label>`).join("");
   const sizes = SIZES[state.cat] || [];
   $("fSizeWrap").hidden = !sizes.length;
   $("fSize").innerHTML = ["", ...sizes].map((g) =>
@@ -390,6 +398,11 @@ document.addEventListener("click", (e) => {
   if (state.saved) renderList();
 });
 $("fCat").addEventListener("change", (e) => update({ cat: e.target.value }));
+$("fArea").addEventListener("change", (e) => {
+  try { localStorage.setItem("area", e.target.value); } catch {}
+  state.stores.clear();
+  update({ area: e.target.value });
+});
 $("fStore").addEventListener("change", (e) => {
   e.target.checked ? state.stores.add(e.target.value) : state.stores.delete(e.target.value);
   update();
@@ -406,7 +419,7 @@ $("cats").addEventListener("click", (e) => {
 $("allDeals").addEventListener("click", () => update({ sale: true, sort: "discount", cat: "" }));
 $("stores").addEventListener("click", (e) => {
   const id = e.target.closest("[data-store]")?.dataset.store;
-  if (id) { state.stores = new Set([id]); update(); }
+  if (id) { state.stores = new Set([id]); update({ area: "" }); }
 });
 $("more").addEventListener("click", () => { state.shown += PAGE; renderList(); });
 
@@ -432,7 +445,7 @@ fetch("data.json", { cache: "no-cache" }).then((r) => r.json()).then((d) => {
   renderCats();
   renderBest();
   renderStores();
-  $("footStores").insertAdjacentHTML("beforeend", data.stores.map((s) => `<a href="pharmacy/${esc(s.id)}.html">${esc(s.name)}</a>`).join(""));
+  $("footStores").insertAdjacentHTML("beforeend", data.stores.filter((s) => s.count).map((s) => `<a href="pharmacy/${esc(s.id)}.html">${esc(s.name)} · ${esc(s.city)}</a>`).join(""));
   update();
   // The sections above fill in after load, so re-scroll if we were sent straight to the comparison.
   if (location.hash === "#compare") goCompare();

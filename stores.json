@@ -5,7 +5,8 @@
     "city": "Salt Lake City",
     "address": "711 S State St, Salt Lake City, UT 84111",
     "website": "https://dragonflywellness.com/products",
-    "source": "dragonfly"
+    "source": "dragonfly",
+    "area": "Salt Lake area"
   },
   {
     "id": "wholesomeco",
@@ -13,7 +14,8 @@
     "city": "West Bountiful",
     "address": "580 W 100 N Suite 1, West Bountiful, UT 84010",
     "website": "https://www.wholesome.co/shop",
-    "source": "wholesome"
+    "source": "wholesome",
+    "area": "Salt Lake area"
   },
   {
     "id": "beehive-slc",
@@ -21,7 +23,8 @@
     "city": "Salt Lake City",
     "address": "1991 S 3600 W, Salt Lake City, UT 84104",
     "website": "https://beehivefarmacy.com/",
-    "source": "partner"
+    "source": "partner",
+    "area": "Salt Lake area"
   },
   {
     "id": "the-forest-murray",
@@ -29,7 +32,8 @@
     "city": "Murray",
     "address": "6041 State St, Murray, UT 84107",
     "website": "https://theforestutah.com/",
-    "source": "partner"
+    "source": "partner",
+    "area": "Salt Lake area"
   },
   {
     "id": "bloc-south-jordan",
@@ -37,6 +41,98 @@
     "city": "South Jordan",
     "address": "10392 South Jordan Gateway, South Jordan, UT 84095",
     "website": "https://blocpharmacy.com/southjordan/",
-    "source": "partner"
+    "source": "partner",
+    "area": "Salt Lake area"
+  },
+  {
+    "id": "curaleaf-lehi",
+    "name": "Curaleaf",
+    "city": "Lehi",
+    "address": "3633 N Thanksgiving Way, Lehi, UT 84043",
+    "website": "https://ut.curaleaf.com/shop/utah/curaleaf-ut-lehi",
+    "source": "partner",
+    "area": "Utah County"
+  },
+  {
+    "id": "curaleaf-provo",
+    "name": "Curaleaf",
+    "city": "Provo",
+    "address": "222 N Draper Lane, Provo, UT 84601",
+    "website": "https://ut.curaleaf.com/shop/utah/curaleaf-ut-provo",
+    "source": "partner",
+    "area": "Utah County"
+  },
+  {
+    "id": "curaleaf-springville",
+    "name": "Curaleaf",
+    "city": "Springville",
+    "address": "484 S 1750 W, Unit F, Springville, UT 84663",
+    "website": "https://ut.curaleaf.com/shop/utah/curaleaf-ut-springville",
+    "source": "partner",
+    "area": "Utah County"
+  },
+  {
+    "id": "curaleaf-park-city",
+    "name": "Curaleaf",
+    "city": "Park City",
+    "address": "1351 Kearns Blvd, Suite 110-B, Park City, UT 84060",
+    "website": "https://ut.curaleaf.com/shop/utah/curaleaf-ut-wellness-park",
+    "source": "partner",
+    "area": "Park City"
+  },
+  {
+    "id": "beehive-brigham-city",
+    "name": "Beehive Farmacy",
+    "city": "Brigham City",
+    "address": "870 W 1150 S, Suite C, Brigham City, UT 84302",
+    "website": "https://shop.beehivefarmacy.com/stores/beehive-farmacy-brigham-city",
+    "source": "partner",
+    "area": "Northern Utah"
+  },
+  {
+    "id": "flower-shop-ogden",
+    "name": "The Flower Shop",
+    "city": "South Ogden",
+    "address": "3775 S Wall Ave, South Ogden, UT 84405",
+    "website": "https://theflowershopusa.com/ogden",
+    "source": "partner",
+    "area": "Northern Utah"
+  },
+  {
+    "id": "flower-shop-logan",
+    "name": "The Flower Shop",
+    "city": "North Logan",
+    "address": "2150 N Main, Suite 1, North Logan, UT 84341",
+    "website": "https://theflowershopusa.com/logan",
+    "source": "partner",
+    "area": "Northern Utah"
+  },
+  {
+    "id": "dragonfly-price",
+    "name": "Dragonfly Wellness",
+    "city": "Price",
+    "address": "20 E Main St, Price, UT 84501",
+    "website": "https://price.dragonflywellness.com/products",
+    "source": "dragonfly",
+    "area": "Central & Eastern Utah",
+    "base": "https://price.dragonflywellness.com"
+  },
+  {
+    "id": "bloc-st-george",
+    "name": "Bloc Pharmacy",
+    "city": "St. George",
+    "address": "1624 S Convention Center Dr, St. George, UT 84790",
+    "website": "https://blocpharmacy.com/stgeorge/",
+    "source": "partner",
+    "area": "Southern Utah"
+  },
+  {
+    "id": "zion-cedar-city",
+    "name": "Zion Medicinal",
+    "city": "Cedar City",
+    "address": "301 S Main St, Cedar City, UT 84720",
+    "website": "https://www.zionmed.com/",
+    "source": "partner",
+    "area": "Southern Utah"
   }
 ]

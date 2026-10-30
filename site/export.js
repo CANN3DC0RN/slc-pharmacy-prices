@@ -6,6 +6,9 @@
     "5ea72292b6c1d3012f5eb694": "beehive-slc",
     "69cd22a84028784c6f7ecf8a": "the-forest-murray",
     "6035916f516b4e34776f4dc5": "bloc-south-jordan",
+    "603fbfd8751ff0189db9b778": "beehive-brigham-city",
+    "60359153c590f500e234ba43": "bloc-st-george",
+    "60b0455896ed3f00b4e88396": "zion-cedar-city",
   };
   const KNOWN_HASH = "cfbda410fd502c77b467a174a666b809bec1e61c70ee7f75de1aff7440b59bf4";
 

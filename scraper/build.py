@@ -27,6 +27,7 @@ SITE_URL = CONFIG["site_url"].rstrip("/")
 SITE_NAME = CONFIG["site_name"]
 GOATCOUNTER = CONFIG.get("goatcounter", "")
 
+HOME_AREA = "Salt Lake area"
 GUIDES = ["Flower", "Vapes", "Concentrates", "Edibles", "Tinctures", "Topicals"]
 SIZES = {"Flower": [1, 3.5, 7, 14, 28], "Vapes": [0.5, 1, 2], "Concentrates": [0.5, 1]}
 ICONS = {
@@ -95,7 +96,7 @@ def page(rel, title, description, body, json_ld=None):
     if GOATCOUNTER:
         ld += f'<script data-goatcounter="https://{GOATCOUNTER}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>\n'
     guides = "".join(f'<a href="{up}prices/{slug(c)}.html">Cheapest {c.lower()}</a>' for c in GUIDES)
-    stores = "".join(f'<a href="{up}pharmacy/{esc(s["id"])}.html">{esc(s["name"])}</a>' for s in STORES)
+    stores = "".join(f'<a href="{up}pharmacy/{esc(s["id"])}.html">{esc(s["name"])} · {esc(s["city"])}</a>' for s in STORES if s.get("count"))
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -263,7 +264,7 @@ def save_snapshot(today):
     if os.path.exists(path):
         return
     os.makedirs(HISTORY, exist_ok=True)
-    rows = [[p["store"], p["category"], p["name"], p["size"], p["grams"], p["price"], p["regular_price"]] for p in PRODUCTS]
+    rows = [[p["store"], p["category"], p["name"], p["size"], p["grams"], p["price"], p["regular_price"]] for p in ALL_PRODUCTS]
     with open(path, "wb") as f:
         f.write(gzip.compress(json.dumps(rows, separators=(",", ":")).encode(), mtime=0))
 
@@ -297,7 +298,7 @@ def build_report(today):
     if any(r["slug"] == slug_ for r in reports) or not PRODUCTS:
         return reports
 
-    live = [s for s in STORES if s.get("count")]
+    live = [s for s in LOCAL_STORES if s.get("count")]
     eighth = of("Flower", 3.5)
     vape = of("Vapes", 1)
     sale = [p for p in PRODUCTS if p["on_sale"]]
@@ -507,7 +508,7 @@ def build_guide(cat):
 
 def build_pharmacy(s):
     rel = f"pharmacy/{s['id']}.html"
-    mine = [p for p in PRODUCTS if p["store"] == s["id"]]
+    mine = [p for p in ALL_PRODUCTS if p["store"] == s["id"]]
     maps = "https://www.google.com/maps/search/?api=1&query=" + urllib.parse.quote(f"{s['name']} {s['address']}")
     buttons = (f'<a class="btn light" href="../?cat=&amp;store={esc(s["id"])}#compare">See all prices</a>' if mine else "") + \
               f'<a class="btn ghost" href="{esc(s["website"])}" target="_blank" rel="noopener">Website</a>' \
@@ -518,10 +519,10 @@ def build_pharmacy(s):
                  f"Prices checked {esc(checked(s))}.")
     else:
         intro = f"{esc(s['address'])}. Prices coming soon."
-    body = hero([("Home", "../"), ("Pharmacies", "../#pharmacies"), (s["name"], None)],
-                f"{esc(s['name'])} prices &amp; deals", intro, buttons)
+    body = hero([("Home", "../"), ("Pharmacies", "../#pharmacies"), (f"{s['name']} · {s['city']}", None)],
+                f"{esc(s['name'])} {esc(s['city'])}: prices &amp; deals", intro, buttons)
     parts = []
-    desc = f"Medical cannabis prices and deals at {s['name']} in {s['city']}, Utah, compared with other Salt Lake area pharmacies."
+    desc = f"Medical cannabis prices and deals at {s['name']} in {s['city']}, Utah, compared with other Utah pharmacies."
     if mine:
         rows = []
         for cat in GUIDES:
@@ -533,7 +534,7 @@ def build_pharmacy(s):
                          median_price(here), median_price(area), f'{sum(p["on_sale"] for p in here):,}'])
         parts.append(section("Prices by category", f"How {esc(s['name'])} compares with the Salt Lake area median.",
                              table([("Category", False), ("Products", True), ("From", True), ("Median here", True),
-                                    ("Area median", True), ("On sale", True)], rows)))
+                                    ("Salt Lake median", True), ("On sale", True)], rows)))
         eighth = of("Flower", 3.5, mine)
         if eighth:
             here_m, area_m = median([p["price"] for p in eighth]), median([p["price"] for p in of("Flower", 3.5)])
@@ -585,7 +586,7 @@ def build_sitemap(reports, stories):
     urls = [("", today), ("reports/", reports[0]["published"] if reports else today),
             ("news/", stories[0]["published"][:10] if stories else today)]
     urls += [(f"prices/{slug(c)}.html", today) for c in GUIDES]
-    urls += [(f"pharmacy/{s['id']}.html", today) for s in STORES]
+    urls += [(f"pharmacy/{s['id']}.html", today) for s in STORES if s.get("count")]
     urls += [(f"reports/{r['slug']}.html", r["published"]) for r in reports]
     entries = "".join(f"<url><loc>{SITE_URL}/{u}</loc><lastmod>{d}</lastmod></url>\n" for u, d in urls)
     write("sitemap.xml", f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{entries}</urlset>\n')
@@ -593,11 +594,15 @@ def build_sitemap(reports, stories):
 
 
 def main():
-    global DATA, PRODUCTS, STORES, STORES_BY_ID, NOW
+    global DATA, ALL_PRODUCTS, PRODUCTS, STORES, LOCAL_STORES, STORES_BY_ID, NOW
     with open(os.path.join(SITE, "data.json")) as f:
         DATA = json.load(f)
-    PRODUCTS, STORES = DATA["products"], DATA["stores"]
+    ALL_PRODUCTS, STORES = DATA["products"], DATA["stores"]
     STORES_BY_ID = {s["id"]: s for s in STORES}
+    # Reports and price guides are about Salt Lake; pharmacy pages and history cover every store.
+    LOCAL_STORES = [s for s in STORES if s.get("area", HOME_AREA) == HOME_AREA]
+    local_ids = {s["id"] for s in LOCAL_STORES}
+    PRODUCTS = [p for p in ALL_PRODUCTS if p["store"] in local_ids]
     NOW = datetime.datetime.now(TZ)
     today = NOW.date()
 

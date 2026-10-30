@@ -254,3 +254,5 @@ footer .about { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.12)
   border-radius: var(--radius-sm); padding: 10px 14px; font-size: 14px; margin-bottom: 12px; }
 .savedbar .link { background: none; border: 0; cursor: pointer; padding: 0; }
 .savedbar[hidden] { display: none; }
+.city { color: var(--faint); font-weight: 500; }
+.store h3 .city { font-size: 14px; }

@@ -14,7 +14,8 @@ def _rsc_text(html):
 
 
 def scrape(store):
-    text = _rsc_text(fetch(BASE + "/products"))
+    base = store.get("base", BASE)  # each Dragonfly location has its own site
+    text = _rsc_text(fetch(base + "/products"))
     key = '"serverProducts":'
     i = text.find(key)
     if i < 0:
@@ -36,7 +37,7 @@ def scrape(store):
             price=regular - discount,
             regular_price=regular,
             size=p.get("weight"),
-            url=f"{BASE}/products/{p['urlName']}",
+            url=f"{base}/products/{p['urlName']}",
             thc=parse_thc(potency),
             deal=f"{round(100 * discount / regular)}% off" if discount else "",
             strain_type=p.get("dominance"),
