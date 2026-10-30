@@ -83,9 +83,11 @@
             <label class="sr" for="sort">Sort by</label>
             <select id="sort">
               <option value="price">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
               <option value="ppg">Price per gram: low to high</option>
               <option value="discount">Biggest discount</option>
               <option value="thc">THC: high to low</option>
+              <option value="thc-asc">THC: low to high</option>
             </select>
           </div>
           <div class="count" id="count" aria-live="polite"></div>
@@ -305,7 +307,10 @@ function renderList() {
     price: (a, b) => a.price - b.price,
     ppg: (a, b) => (a.price_per_gram ?? 1e9) - (b.price_per_gram ?? 1e9) || a.price - b.price,
     discount: (a, b) => pctOff(b) - pctOff(a) || a.price - b.price,
+    "price-desc": (a, b) => b.price - a.price,
     thc: (a, b) => (b.thc ?? -1) - (a.thc ?? -1),
+    // Products with no THC listed go last, not first.
+    "thc-asc": (a, b) => (a.thc ?? 1e9) - (b.thc ?? 1e9) || a.price - b.price,
   }[state.sort];
   const list = data.products.filter((p) => inScope(p)).sort(by);
   $("count").textContent = `${list.length.toLocaleString()} ${list.length === 1 ? "product" : "products"}`;
