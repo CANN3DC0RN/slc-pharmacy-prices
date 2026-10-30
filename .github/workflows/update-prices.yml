@@ -6,7 +6,7 @@ on:
   workflow_dispatch:          # "Run workflow" button for a manual refresh
   push:
     branches: [main]
-    paths: ["partners/**", "stores.json", "config.json", "site/index.html", "site/style.css", "scraper/**"]
+    paths: ["partners/**", "events/**", "stores.json", "config.json", "site/index.html", "site/style.css", "scraper/**"]
 
 permissions:
   contents: write
@@ -36,7 +36,10 @@ jobs:
       - name: Collect Utah cannabis news
         run: python3 scraper/news.py
 
-      - name: Build reports, guides, pharmacy pages, news page and sitemap
+      - name: Collect Utah cannabis events
+        run: python3 scraper/events.py
+
+      - name: Build reports, guides, pharmacy pages, news and events pages, sitemap
         run: python3 scraper/build.py
 
       - name: Save data (keeps last good prices if a store fails next time)

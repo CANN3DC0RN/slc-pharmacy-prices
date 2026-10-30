@@ -27,6 +27,7 @@
       <a href="#deals">Deals</a>
       <a href="#pharmacies">Pharmacies</a>
       <a href="reports/">Price reports</a>
+      <a href="events/">Events</a>
       <a href="news/">News</a>
       <a href="#for-pharmacies">For pharmacies</a>
       <a class="primary" href="#compare">Compare prices</a>
@@ -129,6 +130,14 @@
       </div>
     </section>
 
+    <section id="events" aria-labelledby="evH" hidden>
+      <div class="head">
+        <div><h2 id="evH">Upcoming events</h2><p>Festivals, card clinics, pharmacy events and public meetings in Utah.</p></div>
+        <a class="link" href="events/">All events →</a>
+      </div>
+      <ul class="events" id="eventList"></ul>
+    </section>
+
     <section id="news" aria-labelledby="newsH">
       <div class="head">
         <div><h2 id="newsH">Utah cannabis news</h2><p>The latest headlines from local newsrooms.</p></div>
@@ -174,6 +183,7 @@
     <div class="flinks">
       <h4>More</h4>
       <a href="reports/">Weekly price reports</a>
+      <a href="events/">Cannabis events</a>
       <a href="news/">Utah cannabis news</a>
       <a href="#compare">Compare prices</a>
       <a href="#deals">Today's deals</a>
@@ -503,6 +513,22 @@ fetch("data.json", { cache: "no-cache" }).then((r) => r.json()).then((d) => {
 }).catch(() => {
   $("list").innerHTML = `<div class="empty">Couldn't load prices right now. Please refresh in a minute.</div>`;
 });
+
+fetch("events/events.json", { cache: "no-cache" }).then((r) => r.json()).then((list) => {
+  const today = new Date().toLocaleDateString("en-CA");
+  const next = list.filter((e) => (e.end || e.start) >= today).slice(0, 4);
+  if (!next.length) return;
+  const day = (iso) => new Date(iso + "T12:00");
+  $("eventList").innerHTML = next.map((e) => {
+    const d = day(e.start);
+    const when = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) + (e.time ? " · " + e.time : "");
+    const where = [e.location, e.city].filter(Boolean).join(", ");
+    return `<li class="event"><div class="cal"><span>${d.toLocaleDateString("en-US", { month: "short" })}</span><b>${d.getDate()}</b></div>
+      <div class="what"><span class="eyebrow">${esc(e.type)}</span><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title)}</a>
+      <span class="when">${esc(when)}</span>${where ? `<span class="where">${esc(where)}</span>` : ""}</div></li>`;
+  }).join("");
+  $("events").hidden = false;
+}).catch(() => {});
 
 fetch("news/news.json", { cache: "no-cache" }).then((r) => r.json()).then((list) => {
   const date = (iso) => new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });

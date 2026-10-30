@@ -33,6 +33,8 @@ FEEDS = [
     ("Utah Public Radio", "https://www.upr.org/news.rss"),
     ("Utah Public Radio", "https://www.upr.org/tags/medical-cannabis.rss"),
     ("KPCW", "https://www.kpcw.org/news.rss"),
+    # Runs Utah's medical cannabis program since 2026
+    ("Utah Department of Agriculture and Food", "https://ag.utah.gov/news/feed/"),
 ]
 
 # Whole words only, so "THC" doesn't match inside other words.

@@ -92,7 +92,7 @@ def write(rel, text):
 def page(rel, title, description, body, json_ld=None):
     """Wrap body in the site's nav and footer. Every generated page sits one folder deep."""
     up = "../"
-    ld = f'<script type="application/ld+json">{json.dumps(json_ld)}</script>\n' if json_ld else ""
+    ld = f'<script type="application/ld+json">{json.dumps(json_ld).replace("</", "<\\/")}</script>\n' if json_ld else ""
     if GOATCOUNTER:
         ld += f'<script data-goatcounter="https://{GOATCOUNTER}.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>\n'
     guides = "".join(f'<a href="{up}prices/{slug(c)}.html">Cheapest {c.lower()}</a>' for c in GUIDES)
@@ -125,6 +125,7 @@ def page(rel, title, description, body, json_ld=None):
       <a href="{up}#deals">Deals</a>
       <a href="{up}#pharmacies">Pharmacies</a>
       <a href="{up}reports/">Price reports</a>
+      <a href="{up}events/">Events</a>
       <a href="{up}news/">News</a>
       <a class="primary" href="{up}#compare">Compare prices</a>
     </nav>
@@ -141,7 +142,7 @@ def page(rel, title, description, body, json_ld=None):
     </div>
     <div class="flinks"><h4>Price guides</h4>{guides}</div>
     <div class="flinks"><h4>Pharmacies</h4>{stores}</div>
-    <div class="flinks"><h4>More</h4><a href="{up}reports/">Weekly price reports</a><a href="{up}news/">Utah cannabis news</a><a href="{up}#compare">Compare prices</a><a href="{up}#deals">Today's deals</a></div>
+    <div class="flinks"><h4>More</h4><a href="{up}reports/">Weekly price reports</a><a href="{up}events/">Cannabis events</a><a href="{up}news/">Utah cannabis news</a><a href="{up}#compare">Compare prices</a><a href="{up}#deals">Today's deals</a></div>
     <div class="about">
       <p>Prices come from each pharmacy's online menu. Prices and availability can change, so always confirm with the pharmacy before you go.</p>
       <p>For Utah medical cannabis cardholders. We don't sell anything and aren't affiliated with any pharmacy listed. Nothing here is medical advice.</p>
@@ -579,12 +580,70 @@ def build_news():
     return stories
 
 
+# ---------- events ----------
+
+def event_date(e):
+    start = datetime.date.fromisoformat(e["start"])
+    text = f"{start:%a}, {start:%b} {start.day}"
+    if e["end"]:
+        end = datetime.date.fromisoformat(e["end"])
+        text += f" – {end:%b} {end.day}" if end.month != start.month else f"–{end.day}"
+    return text + (f" · {e['time']}" if e["time"] else "")
+
+
+def event_item(e):
+    start = datetime.date.fromisoformat(e["start"])
+    where = ", ".join(x for x in (e["location"], e["city"]) if x)
+    return f"""<li class="event">
+  <div class="cal"><span>{start:%b}</span><b>{start.day}</b></div>
+  <div class="what">
+    <span class="eyebrow">{esc(e["type"])}</span>
+    <a href="{esc(e["url"])}" target="_blank" rel="noopener">{esc(e["title"])}</a>
+    <span class="when">{esc(event_date(e))}</span>
+    {f'<span class="where">{esc(where)}</span>' if where else ""}
+    {f'<p>{esc(e["details"])}</p>' if e["details"] else ""}
+  </div>
+</li>"""
+
+
+def build_events():
+    path = os.path.join(SITE, "events", "events.json")
+    events = []
+    if os.path.exists(path):
+        with open(path) as f:
+            events = json.load(f)
+    today = NOW.date().isoformat()
+    upcoming = [e for e in events if (e["end"] or e["start"]) >= today]
+    past = [e for e in events if (e["end"] or e["start"]) < today][::-1]
+    inner = (f'<ul class="events">{"".join(event_item(e) for e in upcoming)}</ul>' if upcoming
+             else '<p class="note">No upcoming events right now. Check back soon.</p>')
+    body = hero([("Home", "../"), ("Events", None)], "Utah cannabis events",
+                "Festivals, medical card clinics, pharmacy events and public meetings about medical cannabis in Utah. "
+                "Details change, so confirm with the organizer before you go.")
+    body += f'<div class="wrap"><section><div class="head"><div><h2>Upcoming</h2></div></div>{inner}</section>'
+    if past:
+        body += section("Recent", "", f'<ul class="events past">{"".join(event_item(e) for e in past)}</ul>')
+    body += section("Know of an event?", "", """<div class="prose"><p>Festivals, card clinics, pharmacy parties, classes and
+patient meetups in Utah all belong here. Events are added to <code>events/events.csv</code> in the site's GitHub repository.</p></div>""")
+    body += "</div>"
+    ld = [{"@context": "https://schema.org", "@type": "Event", "name": e["title"], "startDate": e["start"],
+           **({"endDate": e["end"]} if e["end"] else {}), "description": e["details"], "url": e["url"],
+           "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+           "location": {"@type": "Place", "name": e["location"] or e["city"],
+                        "address": {"@type": "PostalAddress", "addressLocality": e["city"], "addressRegion": "UT"}}}
+          for e in upcoming]
+    write("events/index.html", page("events/", f"Utah Cannabis Events · {SITE_NAME}",
+                                    "Upcoming medical cannabis events in Utah: festivals, medical card clinics, pharmacy events and public meetings.",
+                                    body, ld or None))
+    return upcoming
+
+
 # ---------- sitemap ----------
 
 def build_sitemap(reports, stories):
     today = NOW.date().isoformat()
     urls = [("", today), ("reports/", reports[0]["published"] if reports else today),
-            ("news/", stories[0]["published"][:10] if stories else today)]
+            ("news/", stories[0]["published"][:10] if stories else today), ("events/", today)]
     urls += [(f"prices/{slug(c)}.html", today) for c in GUIDES]
     urls += [(f"pharmacy/{s['id']}.html", today) for s in STORES if s.get("count")]
     urls += [(f"reports/{r['slug']}.html", r["published"]) for r in reports]
@@ -614,6 +673,7 @@ def main():
     for s in STORES:
         build_pharmacy(s)
     stories = build_news()
+    build_events()
     build_sitemap(reports, stories)
     print(f"Built {len(GUIDES)} guides, {len(STORES)} pharmacy pages, {len(reports)} reports")
 
