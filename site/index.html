@@ -13,184 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #f7f8f6; --surface: #ffffff; --surface-2: #f1f3ef; --text: #15201a; --muted: #5f6b64; --faint: #8a948e;
-  --line: #e3e7e2; --brand: #0f3d2a; --brand-2: #17603f; --accent: #1f8a55; --accent-soft: #e5f4ec;
-  --sale: #c2410c; --sale-soft: #fff1e6; --img-bg: #ffffff;
-  --shadow: 0 1px 2px rgba(16, 32, 24, .06), 0 4px 16px rgba(16, 32, 24, .06);
-  --shadow-hover: 0 2px 4px rgba(16, 32, 24, .08), 0 12px 28px rgba(16, 32, 24, .12);
-  --radius: 14px; --radius-sm: 10px;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1411; --surface: #161e1a; --surface-2: #1c2621; --text: #e9eeeb; --muted: #a2ada7; --faint: #78847d;
-    --line: #26322c; --accent: #4cc489; --accent-soft: #183326; --sale: #fb923c; --sale-soft: #3a2416; --img-bg: #f4f5f3;
-    --shadow: 0 1px 2px rgba(0,0,0,.3); --shadow-hover: 0 8px 24px rgba(0,0,0,.4);
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 72px; }
-body { margin: 0; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased;
-  font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-a { color: inherit; }
-button, input, select { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.wrap { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
-@media (min-width: 720px) { .wrap { padding: 0 24px; } }
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-
-/* Nav */
-.nav { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--brand) 96%, transparent);
-  backdrop-filter: saturate(140%) blur(8px); color: #fff; }
-.nav .wrap { display: flex; align-items: center; gap: 24px; height: 60px; }
-.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.02em; text-decoration: none; font-size: 17px; }
-.logo svg { flex: none; }
-.nav nav { margin-left: auto; display: flex; gap: 4px; }
-.nav nav a { text-decoration: none; font-size: 14px; font-weight: 500; opacity: .85; padding: 8px 12px; border-radius: 8px; }
-.nav nav a:hover { opacity: 1; background: rgba(255,255,255,.08); }
-.logo, .nav nav a { white-space: nowrap; }
-@media (max-width: 640px) {
-  .nav nav a:not(.primary) { display: none; }
-  .nav .wrap { gap: 12px; }
-  .nav .logo { font-size: 15px; }
-  .nav nav a.primary { padding: 7px 12px; font-size: 13px; }
-}
-.nav nav a.primary { background: #7ee2a8; color: var(--brand); opacity: 1; font-weight: 600; }
-
-/* Hero */
-.hero { background: radial-gradient(1200px 400px at 85% -10%, #1f7a4f 0%, transparent 60%), linear-gradient(180deg, var(--brand) 0%, #0b2e20 100%);
-  color: #fff; padding: 56px 0 64px; }
-.hero h1 { font-size: clamp(30px, 5vw, 48px); line-height: 1.08; letter-spacing: -.035em; margin: 0 0 14px; max-width: 760px; font-weight: 800; }
-.hero h1 em { font-style: normal; color: #7ee2a8; }
-.hero p { margin: 0 0 28px; font-size: 17px; color: rgba(255,255,255,.78); max-width: 620px; }
-.search { display: flex; background: #fff; border-radius: 14px; padding: 6px; max-width: 640px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-.search svg { flex: none; margin: 0 4px 0 12px; align-self: center; color: #6b766f; }
-.search input { flex: 1; min-width: 0; border: 0; outline: 0; padding: 12px 8px; font-size: 16px; color: #15201a; background: transparent; }
-.search button { border: 0; background: var(--accent); color: #fff; font-weight: 600; padding: 0 22px; border-radius: 10px; cursor: pointer; }
-.search button:hover { background: #197a4a; }
-.stats { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 28px; font-size: 14px; color: rgba(255,255,255,.75); }
-.stats b { color: #fff; font-size: 20px; display: block; letter-spacing: -.02em; }
-.live { display: inline-flex; align-items: center; gap: 8px; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: #7ee2a8; box-shadow: 0 0 0 4px rgba(126,226,168,.2); flex: none; }
-
-/* Sections */
-section { padding: 48px 0 0; }
-.head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
-.head h2 { margin: 0; font-size: 24px; letter-spacing: -.025em; }
-.head p { margin: 4px 0 0; color: var(--muted); }
-.link { color: var(--accent); font-weight: 600; text-decoration: none; font-size: 14px; white-space: nowrap; }
-.link:hover { text-decoration: underline; }
-
-/* Category tiles */
-.cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-.cat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; cursor: pointer;
-  text-align: left; display: flex; flex-direction: column; gap: 2px; transition: border-color .15s, box-shadow .15s, transform .15s; }
-.cat:hover { border-color: var(--accent); box-shadow: var(--shadow-hover); transform: translateY(-2px); }
-.cat .ic { width: 40px; height: 40px; border-radius: 10px; background: var(--accent-soft); color: var(--accent);
-  display: grid; place-items: center; margin-bottom: 10px; }
-.cat b { font-size: 15px; }
-.cat span { font-size: 13px; color: var(--muted); }
-
-/* Product cards */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; text-decoration: none;
-  display: flex; flex-direction: column; box-shadow: var(--shadow); transition: box-shadow .15s, transform .15s, border-color .15s; }
-.card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
-.thumb { position: relative; aspect-ratio: 4 / 3; background: var(--img-bg); display: grid; place-items: center; border-bottom: 1px solid var(--line); }
-.thumb img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
-.thumb .ph { color: #b9c2bc; }
-.tag { position: absolute; top: 10px; left: 10px; background: var(--sale); color: #fff; font-size: 12px; font-weight: 700;
-  padding: 3px 8px; border-radius: 6px; letter-spacing: .01em; }
-.body { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-.brand { font-size: 11px; font-weight: 600; color: var(--faint); text-transform: uppercase; letter-spacing: .07em; }
-.name { font-weight: 600; font-size: 15px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.chips { display: flex; flex-wrap: wrap; gap: 4px; }
-.chip-s { font-size: 12px; color: var(--muted); background: var(--surface-2); border-radius: 6px; padding: 2px 7px; }
-.price { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 8px; flex-wrap: wrap; }
-.price strong { font-size: 22px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.price s { color: var(--faint); font-size: 14px; }
-.ppg { margin-left: auto; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.store-line { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); padding-top: 10px; border-top: 1px solid var(--line); margin-top: 8px; }
-.store-line .dot { width: 6px; height: 6px; box-shadow: none; background: var(--accent); }
-.store-line span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-@media (max-width: 560px) {
-  .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .grid .body { padding: 10px; gap: 4px; }
-  .grid .name { font-size: 14px; }
-  .grid .price strong { font-size: 18px; }
-  .grid .ppg { margin-left: 0; width: 100%; }
-  .grid .chip-s:nth-child(n+2) { display: none; }
-  .grid .store-line { font-size: 12px; }
-  .grid .thumb img { padding: 6px; }
-  .cats { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .cat .ic { margin-bottom: 6px; }
-}
-
-/* Deals carousel */
-.rail { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 1fr); gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
-  padding: 4px 2px 16px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
-.rail .card { scroll-snap-align: start; }
-@media (min-width: 1000px) { .rail { grid-auto-columns: calc((100% - 64px) / 5); } }
-
-/* Compare layout */
-.layout { display: grid; gap: 24px; }
-@media (min-width: 900px) { .layout { grid-template-columns: 240px 1fr; align-items: start; } }
-.filters { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 4px 16px 16px; }
-@media (min-width: 900px) { .filters { position: sticky; top: 76px; } }
-.filters summary { list-style: none; cursor: pointer; font-weight: 600; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; }
-.filters summary::-webkit-details-marker { display: none; }
-.filters[open] summary .chev { transform: rotate(180deg); }
-.fgroup { padding: 12px 0; border-top: 1px solid var(--line); }
-.fgroup h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--faint); margin: 0 0 8px; }
-.opt { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 14px; cursor: pointer; }
-.opt input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
-.opt .n { margin-left: auto; color: var(--faint); font-size: 12px; font-variant-numeric: tabular-nums; }
-.pills { display: flex; flex-wrap: wrap; gap: 6px; }
-.pill { border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 4px 12px; font-size: 13px; cursor: pointer; }
-.pill[aria-pressed=true] { background: var(--brand-2); border-color: var(--brand-2); color: #fff; }
-.toggle { display: flex; align-items: center; justify-content: space-between; font-size: 14px; cursor: pointer; }
-.toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
-.clear { margin-top: 12px; width: 100%; border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 8px; cursor: pointer; font-size: 13px; font-weight: 500; }
-.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
-.toolbar .q { flex: 1 1 240px; display: flex; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; }
-.toolbar .q svg { color: var(--faint); flex: none; }
-.toolbar .q input { border: 0; outline: 0; background: transparent; padding: 10px 8px; width: 100%; }
-.toolbar select { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
-.count { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
-.more { display: block; margin: 28px auto 0; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px 24px; font-weight: 600; cursor: pointer; }
-.more:hover { border-color: var(--accent); color: var(--accent); }
-.empty { grid-column: 1 / -1; text-align: center; padding: 56px 16px; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); }
-.skeleton { background: linear-gradient(90deg, var(--surface-2), var(--surface), var(--surface-2)); background-size: 200% 100%;
-  animation: sh 1.2s infinite; border-radius: var(--radius); height: 320px; }
-@keyframes sh { to { background-position: -200% 0; } }
-
-/* Pharmacies */
-.stores { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-.store { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 6px; }
-.store h3 { margin: 0; font-size: 17px; letter-spacing: -.01em; }
-.store .addr { color: var(--muted); font-size: 14px; }
-.status { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; margin-top: 6px; }
-.status .dot { box-shadow: none; width: 8px; height: 8px; background: var(--accent); }
-.status.soon .dot { background: var(--faint); }
-.status.stale .dot { background: var(--sale); }
-.status.soon { color: var(--muted); }
-.store .links { display: flex; gap: 16px; margin-top: auto; padding-top: 12px; }
-.promo { background: var(--sale-soft); color: var(--sale); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
-
-/* CTA + footer */
-.cta { margin-top: 56px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 32px;
-  display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; }
-.cta h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.02em; }
-.cta p { margin: 0; color: var(--muted); max-width: 560px; }
-.btn { display: inline-block; background: var(--brand); color: #fff; text-decoration: none; font-weight: 600; padding: 12px 20px; border-radius: 10px; }
-.btn:hover { background: var(--brand-2); }
-footer { margin-top: 56px; background: var(--brand); color: rgba(255,255,255,.7); padding: 40px 0; font-size: 13px; }
-footer .wrap { display: grid; gap: 20px; }
-@media (min-width: 720px) { footer .wrap { grid-template-columns: 1fr 2fr; } }
-footer .logo { color: #fff; margin-bottom: 8px; }
-footer p { margin: 0 0 8px; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -203,6 +26,7 @@ footer p { margin: 0 0 8px; }
     <nav aria-label="Main">
       <a href="#deals">Deals</a>
       <a href="#pharmacies">Pharmacies</a>
+      <a href="reports/">Price reports</a>
       <a href="#for-pharmacies">For pharmacies</a>
       <a class="primary" href="#compare">Compare prices</a>
     </nav>
@@ -271,6 +95,26 @@ footer p { margin: 0 0 8px; }
       </div>
     </section>
 
+    <section id="reports" aria-labelledby="repH">
+      <div class="head">
+        <div><h2 id="repH">Price reports &amp; guides</h2><p>A weekly look at prices across Salt Lake, plus the cheapest picks in every category.</p></div>
+        <a class="link" href="reports/">All reports →</a>
+      </div>
+      <a class="latest" id="latest" href="reports/">
+        <span class="eyebrow">Weekly price report</span>
+        <h3>Salt Lake medical cannabis prices, every week</h3>
+        <p>The cheapest flower, vapes and concentrates, the biggest sales, and how each pharmacy compares.</p>
+      </a>
+      <div class="guides">
+        <a href="prices/flower.html">Cheapest flower</a>
+        <a href="prices/vapes.html">Cheapest vapes</a>
+        <a href="prices/concentrates.html">Cheapest concentrates</a>
+        <a href="prices/edibles.html">Cheapest edibles</a>
+        <a href="prices/tinctures.html">Cheapest tinctures</a>
+        <a href="prices/topicals.html">Cheapest topicals</a>
+      </div>
+    </section>
+
     <section id="pharmacies" aria-labelledby="phH">
       <div class="head"><div><h2 id="phH">Pharmacies</h2><p>Salt Lake area pharmacies we track. More coming soon.</p></div></div>
       <div class="stores" id="stores"></div>
@@ -295,7 +139,23 @@ footer p { margin: 0 0 8px; }
       </div>
       <p>© <span id="yr"></span> SLC Pharmacy Prices</p>
     </div>
-    <div>
+    <div class="flinks">
+      <h4>Price guides</h4>
+      <a href="prices/flower.html">Cheapest flower</a>
+      <a href="prices/vapes.html">Cheapest vapes</a>
+      <a href="prices/concentrates.html">Cheapest concentrates</a>
+      <a href="prices/edibles.html">Cheapest edibles</a>
+      <a href="prices/tinctures.html">Cheapest tinctures</a>
+      <a href="prices/topicals.html">Cheapest topicals</a>
+    </div>
+    <div class="flinks" id="footStores"><h4>Pharmacies</h4></div>
+    <div class="flinks">
+      <h4>More</h4>
+      <a href="reports/">Weekly price reports</a>
+      <a href="#compare">Compare prices</a>
+      <a href="#deals">Today's deals</a>
+    </div>
+    <div class="about">
       <p>Prices come from each pharmacy's online menu and are checked automatically throughout the day. Prices and availability can change, so always confirm with the pharmacy before you go.</p>
       <p>For Utah medical cannabis cardholders. We don't sell anything and aren't affiliated with any pharmacy listed.</p>
     </div>
@@ -322,6 +182,10 @@ const icon = (cat, size = 22) => `<svg width="${size}" height="${size}" viewBox=
 
 // Start on Flower: across all categories, $1 accessories crowd the top of a price sort.
 const state = { q: "", cat: "Flower", stores: new Set(), sale: false, sort: "price", size: null, shown: PAGE };
+// Links from the guide and pharmacy pages open the comparison pre-filtered (?cat=Vapes&store=wholesomeco).
+const params = new URLSearchParams(location.search);
+if (params.has("cat")) state.cat = params.get("cat");
+if (params.get("store")) state.stores.add(params.get("store"));
 let data, storesById = {};
 
 const $ = (id) => document.getElementById(id);
@@ -402,7 +266,7 @@ function renderStores() {
     else if (s.count) status = `<span class="status stale"><span class="dot"></span>Showing prices from ${ago(s.updated)}</span>`;
     else status = `<span class="status soon"><span class="dot"></span>Prices coming soon</span>`;
     const map = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(s.name + " " + s.address);
-    return `<div class="store"><h3>${esc(s.name)}</h3><div class="addr">${esc(s.address)}</div>${status}
+    return `<div class="store"><h3><a href="pharmacy/${esc(s.id)}.html">${esc(s.name)}</a></h3><div class="addr">${esc(s.address)}</div>${status}
       ${promos.map((d) => `<div class="promo"><b>${esc(d.title)}</b>${d.details ? "<br>" + esc(d.details) : ""}</div>`).join("")}
       <div class="links"><a class="link" href="${esc(s.website)}" target="_blank" rel="noopener">Website</a>
       <a class="link" href="${map}" target="_blank" rel="noopener">Directions</a>
@@ -502,10 +366,21 @@ fetch("data.json", { cache: "no-cache" }).then((r) => r.json()).then((d) => {
   renderCats();
   renderBest();
   renderStores();
+  $("footStores").insertAdjacentHTML("beforeend", data.stores.map((s) => `<a href="pharmacy/${esc(s.id)}.html">${esc(s.name)}</a>`).join(""));
   update();
+  // The sections above fill in after load, so re-scroll if we were sent straight to the comparison.
+  if (location.hash === "#compare") goCompare();
 }).catch(() => {
   $("list").innerHTML = `<div class="empty">Couldn't load prices right now. Please refresh in a minute.</div>`;
 });
+
+fetch("reports/index.json", { cache: "no-cache" }).then((r) => r.json()).then((list) => {
+  const r = list[0];
+  if (!r) return;
+  $("latest").href = "reports/" + r.slug + ".html";
+  $("latest").querySelector("h3").textContent = r.title;
+  $("latest").querySelector("p").textContent = r.summary;
+}).catch(() => {});
 </script>
 </body>
 </html>

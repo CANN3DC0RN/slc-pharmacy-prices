@@ -79,12 +79,13 @@ def parse_grams(*texts):
         m = re.search(r"(\d+(?:\.\d+)?)\s*(mg|g|gram|grams)\b", t)
         if m and m.group(2) != "mg":
             return float(m.group(1))
+        # Pharmacies sell by the cannabis ounce (28g), so 1/8 oz is the 3.5g eighth.
         m = re.search(r"(\d+)\s*/\s*(\d+)\s*oz", t)
         if m:
-            return round(28.35 * int(m.group(1)) / int(m.group(2)), 2)
+            return round(28 * int(m.group(1)) / int(m.group(2)), 2)
         m = re.search(r"(\d+(?:\.\d+)?)\s*oz\b", t)
         if m:
-            return round(28.35 * float(m.group(1)), 2)
+            return round(28 * float(m.group(1)), 2)
     return None
 
 

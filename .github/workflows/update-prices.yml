@@ -6,7 +6,7 @@ on:
   workflow_dispatch:          # "Run workflow" button for a manual refresh
   push:
     branches: [main]
-    paths: ["partners/**", "stores.json", "site/index.html", "scraper/**"]
+    paths: ["partners/**", "stores.json", "config.json", "site/index.html", "site/style.css", "scraper/**"]
 
 permissions:
   contents: write
@@ -33,11 +33,14 @@ jobs:
       - name: Collect prices
         run: python3 scraper/run.py
 
+      - name: Build reports, guides, pharmacy pages and sitemap
+        run: python3 scraper/build.py
+
       - name: Save data (keeps last good prices if a store fails next time)
         run: |
           git config user.name "price-bot"
           git config user.email "price-bot@users.noreply.github.com"
-          git add site/data.json
+          git add site/data.json history site/reports
           git diff --cached --quiet || git commit -m "Update prices $(date -u +%Y-%m-%dT%H:%MZ)"
           git push
 

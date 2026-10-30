@@ -39,10 +39,24 @@ After that it updates itself every 4 hours. Check **Actions** for the run histor
 
 Later, to use your own domain, go to **Settings → Pages → Custom domain**. Hosting stays free.
 
+## Reports, guides and search pages
+
+After each price update, `scraper/build.py` builds pages from the data:
+
+- **Weekly price report** (`site/reports/`): written once a week (the first run each Monday, Utah time) and then left alone, like a dated article. From the second week on it includes what changed since last week.
+- **Price guides** (`site/prices/flower.html` etc.) and **pharmacy pages** (`site/pharmacy/<id>.html`): rebuilt on every run.
+- **Price history** (`history/`): one small snapshot per day, used for week-over-week changes.
+- **sitemap.xml** and **robots.txt** for search engines.
+
+### When you buy a domain
+
+Change `site_url` in `config.json` to the new address (for example `https://slcpharmacyprices.com`). Links, the sitemap and search-engine tags all follow it. Then submit `<your domain>/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
+
 ## Running it on your computer
 
 ```bash
 python3 scraper/run.py
+python3 scraper/build.py
 python3 -m http.server 8787 --directory site
 ```
 
