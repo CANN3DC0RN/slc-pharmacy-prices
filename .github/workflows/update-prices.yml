@@ -24,7 +24,10 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
+      # Runs wait for each other, so start from the newest commit rather than the one that triggered this run.
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-python@v5
         with:
@@ -48,7 +51,8 @@ jobs:
           git config user.email "price-bot@users.noreply.github.com"
           git add site/data.json history site/reports site/news/news.json
           git diff --cached --quiet || git commit -m "Update prices $(date -u +%Y-%m-%dT%H:%MZ)"
-          git push
+          # If an upload landed while this ran, catch up first; this run's fresh data wins.
+          git push || (git pull --rebase -X theirs && git push)
 
       - uses: actions/upload-pages-artifact@v3
         with:
